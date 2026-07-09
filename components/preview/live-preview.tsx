@@ -9,6 +9,7 @@ import type { DesignSystem, SectionKey } from "@/lib/design-system/types";
 import { systemCssVars, type PreviewMode } from "./preview-vars";
 import { ColorsPreview } from "./sections/colors-preview";
 import { TypographyPreview } from "./sections/typography-preview";
+import { LogoPreview } from "./sections/logo-preview";
 import { FontLoader } from "./font-loader";
 import { cn } from "@/lib/utils";
 
@@ -81,6 +82,8 @@ function PreviewContent({
       return <ColorsPreview system={system} mode={mode} />;
     case "typography":
       return <TypographyPreview system={system} />;
+    case "logo":
+      return <LogoPreview system={system} mode={mode} />;
     default:
       return (
         <div

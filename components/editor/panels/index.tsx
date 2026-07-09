@@ -4,6 +4,7 @@ import type { SectionKey } from "@/lib/design-system/types";
 import { PanelShell } from "./panel-shell";
 import { ColorsPanel } from "./colors-panel";
 import { TypographyPanel } from "./typography-panel";
+import { LogoPanel } from "./logo-panel";
 
 // Die einzelnen Panels werden Modul für Modul ergänzt.
 function PlaceholderPanel({ title }: { title: string }) {
@@ -23,7 +24,7 @@ export function renderPanel(section: SectionKey): React.ReactNode {
     case "typography":
       return <TypographyPanel />;
     case "logo":
-      return <PlaceholderPanel title="Logo & Branding" />;
+      return <LogoPanel />;
     case "spacing":
       return <PlaceholderPanel title="Spacing & Layout" />;
     case "effects":
