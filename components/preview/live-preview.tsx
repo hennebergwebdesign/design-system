@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import type { DesignSystem, SectionKey } from "@/lib/design-system/types";
 import { systemCssVars, type PreviewMode } from "./preview-vars";
+import { ColorsPreview } from "./sections/colors-preview";
 import { cn } from "@/lib/utils";
 
 export function LivePreview({
@@ -51,28 +52,36 @@ export function LivePreview({
           }}
           className="min-h-full p-6"
         >
-          <PreviewContent system={system} section={section} mode={mode} />
+          <div className="mx-auto max-w-3xl">
+            <PreviewContent system={system} section={section} mode={mode} />
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-// Platzhalter — wird in den folgenden Ausbaustufen durch die einzelnen
-// Preview-Sektionen (Colors, Typography, Components …) ersetzt bzw. erweitert.
+// Rendert je nach aktivem Sidebar-Abschnitt die passende Vorschau.
 function PreviewContent({
   system,
   section,
+  mode,
 }: {
   system: DesignSystem;
   section: SectionKey;
   mode: PreviewMode;
 }) {
-  void system;
-  void section;
-  return (
-    <div className="flex h-64 items-center justify-center text-sm" style={{ color: "var(--ds-text-muted)" }}>
-      Die Vorschau-Komponenten folgen mit den nächsten Modulen.
-    </div>
-  );
+  switch (section) {
+    case "colors":
+      return <ColorsPreview system={system} mode={mode} />;
+    default:
+      return (
+        <div
+          className="flex h-64 items-center justify-center text-sm"
+          style={{ color: "var(--ds-text-muted)" }}
+        >
+          Die Vorschau für diesen Abschnitt folgt mit dem nächsten Modul.
+        </div>
+      );
+  }
 }

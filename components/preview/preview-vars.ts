@@ -6,6 +6,7 @@ import type { CSSProperties } from "react";
 import type { DesignSystem, ColorKey } from "@/lib/design-system/types";
 import { SCALE_STEPS, BRAND_COLOR_KEYS, SEMANTIC_COLOR_KEYS } from "@/lib/design-system/types";
 import { generateScale, readableTextColor } from "@/lib/design-system/color";
+import { deriveSurfaces } from "@/lib/design-system/derive";
 
 export type PreviewMode = "light" | "dark";
 
@@ -29,20 +30,12 @@ export function systemCssVars(system: DesignSystem, mode: PreviewMode): CSSPrope
   }
 
   // Neutral-abgeleitete Oberflächen für den jeweiligen Modus
-  const neutral = generateScale(colors.neutral[mode]);
-  if (mode === "light") {
-    vars["--ds-bg"] = "#ffffff";
-    vars["--ds-surface"] = neutral["50"];
-    vars["--ds-text"] = neutral["950"];
-    vars["--ds-text-muted"] = neutral["600"];
-    vars["--ds-border"] = neutral[effects.borderColorStep];
-  } else {
-    vars["--ds-bg"] = neutral["950"];
-    vars["--ds-surface"] = neutral["900"];
-    vars["--ds-text"] = neutral["50"];
-    vars["--ds-text-muted"] = neutral["400"];
-    vars["--ds-border"] = neutral["800"];
-  }
+  const surfaces = deriveSurfaces(system, mode);
+  vars["--ds-bg"] = surfaces.bg;
+  vars["--ds-surface"] = surfaces.surface;
+  vars["--ds-text"] = surfaces.text;
+  vars["--ds-text-muted"] = surfaces.textMuted;
+  vars["--ds-border"] = surfaces.border;
 
   vars["--ds-font-heading"] = fontStack(typography.heading.family, typography.heading.category);
   vars["--ds-font-body"] = fontStack(typography.body.family, typography.body.category);

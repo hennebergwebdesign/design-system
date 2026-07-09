@@ -128,3 +128,26 @@
     @apply font-sans;
   }
 }
+/* --- Live-Preview-Hilfsklassen (Hover/Focus für token-gesteuerte Elemente) --- */
+.ds-btn {
+  cursor: pointer;
+  transition: filter 150ms ease, background-color 150ms ease, transform 100ms ease;
+}
+.ds-btn:hover:not(:disabled) {
+  filter: brightness(0.94);
+}
+.ds-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.ds-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.ds-ghost:hover:not(:disabled) {
+  filter: none;
+  background-color: color-mix(in srgb, currentColor 10%, transparent) !important;
+}
+.ds-focus:focus-visible {
+  outline: 2px solid var(--ds-primary);
+  outline-offset: 2px;
+}

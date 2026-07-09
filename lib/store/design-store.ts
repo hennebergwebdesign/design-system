@@ -19,6 +19,11 @@ import {
 
 const HISTORY_LIMIT = 50;
 
+// Schnell aufeinanderfolgende Änderungen (z. B. Color-Picker-Drag) werden zu
+// einem Undo-Schritt zusammengefasst.
+const COALESCE_MS = 500;
+let lastMutationAt = 0;
+
 export type ResettableSection =
   | "colors" | "typography" | "logo" | "spacing" | "effects";
 
@@ -128,12 +133,15 @@ export const useDesignStore = create<DesignStore>()(
         if (!project) return;
         const draft = structuredClone(project.system);
         mutate(draft);
+        const now = Date.now();
+        const pushHistory = now - lastMutationAt > COALESCE_MS;
+        lastMutationAt = now;
         set({
           projects: {
             ...projects,
-            [activeProjectId]: { ...project, system: draft, updatedAt: Date.now() },
+            [activeProjectId]: { ...project, system: draft, updatedAt: now },
           },
-          past: [...past.slice(-(HISTORY_LIMIT - 1)), project.system],
+          past: pushHistory ? [...past.slice(-(HISTORY_LIMIT - 1)), project.system] : past,
           future: [],
         });
       },

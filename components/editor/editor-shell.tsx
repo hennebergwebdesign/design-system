@@ -76,7 +76,7 @@ export function EditorShell({
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">Projekt nicht gefunden.</p>
-        <Button variant="outline" render={<Link href="/" />}>
+        <Button variant="outline" nativeButton={false} render={<Link href="/" />}>
           <ArrowLeft /> Zur Übersicht
         </Button>
       </div>
@@ -92,7 +92,7 @@ export function EditorShell({
           variant="ghost"
           size="icon-sm"
           aria-label="Zur Übersicht"
-          render={<Link href="/" />}
+          nativeButton={false} render={<Link href="/" />}
         >
           <ArrowLeft />
         </Button>
