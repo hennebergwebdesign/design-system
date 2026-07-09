@@ -8,6 +8,8 @@ import { Moon, Sun } from "lucide-react";
 import type { DesignSystem, SectionKey } from "@/lib/design-system/types";
 import { systemCssVars, type PreviewMode } from "./preview-vars";
 import { ColorsPreview } from "./sections/colors-preview";
+import { TypographyPreview } from "./sections/typography-preview";
+import { FontLoader } from "./font-loader";
 import { cn } from "@/lib/utils";
 
 export function LivePreview({
@@ -21,6 +23,9 @@ export function LivePreview({
 
   return (
     <div className="flex h-full flex-col">
+      <FontLoader
+        families={[system.typography.heading.family, system.typography.body.family]}
+      />
       <div className="flex items-center justify-between border-b px-4 py-2">
         <span className="text-sm font-medium text-muted-foreground">Live-Vorschau</span>
         <div className="flex items-center gap-1 rounded-lg bg-muted p-0.5">
@@ -74,6 +79,8 @@ function PreviewContent({
   switch (section) {
     case "colors":
       return <ColorsPreview system={system} mode={mode} />;
+    case "typography":
+      return <TypographyPreview system={system} />;
     default:
       return (
         <div
