@@ -10,6 +10,8 @@ import { systemCssVars, type PreviewMode } from "./preview-vars";
 import { ColorsPreview } from "./sections/colors-preview";
 import { TypographyPreview } from "./sections/typography-preview";
 import { LogoPreview } from "./sections/logo-preview";
+import { SpacingPreview } from "./sections/spacing-preview";
+import { EffectsPreview } from "./sections/effects-preview";
 import { FontLoader } from "./font-loader";
 import { cn } from "@/lib/utils";
 
@@ -84,6 +86,10 @@ function PreviewContent({
       return <TypographyPreview system={system} />;
     case "logo":
       return <LogoPreview system={system} mode={mode} />;
+    case "spacing":
+      return <SpacingPreview system={system} />;
+    case "effects":
+      return <EffectsPreview system={system} />;
     default:
       return (
         <div

@@ -5,6 +5,8 @@ import { PanelShell } from "./panel-shell";
 import { ColorsPanel } from "./colors-panel";
 import { TypographyPanel } from "./typography-panel";
 import { LogoPanel } from "./logo-panel";
+import { SpacingPanel } from "./spacing-panel";
+import { EffectsPanel } from "./effects-panel";
 
 // Die einzelnen Panels werden Modul für Modul ergänzt.
 function PlaceholderPanel({ title }: { title: string }) {
@@ -26,9 +28,9 @@ export function renderPanel(section: SectionKey): React.ReactNode {
     case "logo":
       return <LogoPanel />;
     case "spacing":
-      return <PlaceholderPanel title="Spacing & Layout" />;
+      return <SpacingPanel />;
     case "effects":
-      return <PlaceholderPanel title="Effects" />;
+      return <EffectsPanel />;
     case "components":
       return <PlaceholderPanel title="Components" />;
     case "export":
