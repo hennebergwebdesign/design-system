@@ -1,0 +1,34 @@
+"use client";
+
+import type { SectionKey } from "@/lib/design-system/types";
+import { PanelShell } from "./panel-shell";
+
+// Die einzelnen Panels werden Modul für Modul ergänzt.
+function PlaceholderPanel({ title }: { title: string }) {
+  return (
+    <PanelShell title={title} description="Dieses Modul folgt in Kürze.">
+      <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+        Noch nicht implementiert
+      </div>
+    </PanelShell>
+  );
+}
+
+export function renderPanel(section: SectionKey): React.ReactNode {
+  switch (section) {
+    case "colors":
+      return <PlaceholderPanel title="Colors" />;
+    case "typography":
+      return <PlaceholderPanel title="Typography" />;
+    case "logo":
+      return <PlaceholderPanel title="Logo & Branding" />;
+    case "spacing":
+      return <PlaceholderPanel title="Spacing & Layout" />;
+    case "effects":
+      return <PlaceholderPanel title="Effects" />;
+    case "components":
+      return <PlaceholderPanel title="Components" />;
+    case "export":
+      return <PlaceholderPanel title="Export" />;
+  }
+}
