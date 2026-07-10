@@ -1,91 +1,152 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ClipboardCopy, Download, FileCode, FileJson } from "lucide-react";
+import { Download, FileCode, FileJson, Copy, Check } from "lucide-react";
 import { PanelShell, PanelGroup } from "./panel-shell";
-import { Button } from "@/components/ui/button";
 import { useDesignSystem } from "@/lib/store/design-store";
-import { exportDesignSystem, type ExportFormat } from "@/lib/design-system/export";
-import { cn } from "@/lib/utils";
+import { useActiveProject } from "@/lib/store/design-store";
+import { useComponentStore } from "@/lib/store/component-store";
+import {
+  generateExportHtml,
+  generateDesignTokensJson,
+} from "@/lib/design-system/export-html";
 
-const FORMATS: { key: ExportFormat; label: string; icon: React.ReactNode; ext: string }[] = [
-  { key: "css", label: "CSS Variables", icon: <FileCode className="size-4" />, ext: "css" },
-  { key: "tailwind", label: "Tailwind Config", icon: <FileCode className="size-4" />, ext: "ts" },
-  { key: "json", label: "JSON Tokens", icon: <FileJson className="size-4" />, ext: "json" },
-];
+type ExportMode = "light" | "dark" | "both";
 
 export function ExportPanel() {
   const system = useDesignSystem();
-  const [format, setFormat] = useState<ExportFormat>("css");
-  const [copied, setCopied] = useState(false);
+  const project = useActiveProject();
+  const { selectedIds, slotOverrides } = useComponentStore();
+  const [mode, setMode] = useState<ExportMode>("both");
+  const [copied, setCopied] = useState<string | null>(null);
 
-  if (!system) return null;
-
-  const output = exportDesignSystem(system, format);
-
-  function handleCopy() {
-    navigator.clipboard.writeText(output);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  if (!system || !project) {
+    return (
+      <PanelShell title="Export">
+        <p className="text-sm text-muted-foreground">Kein aktives Projekt.</p>
+      </PanelShell>
+    );
   }
 
-  function handleDownload() {
-    const meta = FORMATS.find((f) => f.key === format)!;
-    const filename = `design-system.${meta.ext}`;
-    const blob = new Blob([output], { type: "text/plain" });
+  const handleCopy = async (content: string, label: string) => {
+    await navigator.clipboard.writeText(content);
+    setCopied(label);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const handleDownload = (content: string, filename: string, mimeType: string) => {
+    const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
-  }
+  };
+
+  const htmlOutput = generateExportHtml({
+    selectedIds,
+    slotOverrides,
+    system,
+    projectName: project.name,
+    mode,
+    includeJsonLd: true,
+  });
+
+  const jsonOutput = generateDesignTokensJson(system);
 
   return (
-    <PanelShell title="Export" description="Design-Tokens in verschiedenen Formaten exportieren.">
-      <PanelGroup label="Format">
-        <div className="grid grid-cols-3 gap-2">
-          {FORMATS.map((f) => (
+    <PanelShell
+      title="Export"
+      description="Exportieren Sie Ihre Seite als eigenständige HTML-Datei oder Design-Tokens als JSON."
+    >
+      <PanelGroup label="Farbmodus">
+        <div className="flex gap-2">
+          {(["light", "dark", "both"] as const).map((m) => (
             <button
-              key={f.key}
-              onClick={() => setFormat(f.key)}
-              className={cn(
-                "flex flex-col items-center gap-1.5 rounded-lg border p-3 text-xs font-medium transition-colors",
-                format === f.key
-                  ? "border-foreground bg-foreground/5"
-                  : "border-border hover:border-foreground/30",
-              )}
+              key={m}
+              onClick={() => setMode(m)}
+              className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
+                mode === m
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:bg-muted"
+              }`}
             >
-              {f.icon}
-              {f.label}
+              {m === "light" ? "Light" : m === "dark" ? "Dark" : "Light + Dark"}
             </button>
           ))}
         </div>
       </PanelGroup>
 
-      <PanelGroup label="Vorschau">
-        <div className="relative">
-          <pre className="max-h-64 overflow-auto rounded-lg border bg-muted/50 p-3 text-[11px] leading-relaxed">
-            <code>{output.slice(0, 2000)}{output.length > 2000 ? "\n\n/* … */" : ""}</code>
-          </pre>
-          <div className="absolute right-2 top-2 flex gap-1">
-            <Button variant="ghost" size="icon-sm" aria-label="Kopieren" onClick={handleCopy}>
-              {copied ? <Check className="size-3.5 text-green-600" /> : <ClipboardCopy className="size-3.5" />}
-            </Button>
-          </div>
+      <PanelGroup label="HTML-Seite">
+        <p className="text-xs text-muted-foreground mb-3">
+          {selectedIds.length === 0
+            ? "Wählen Sie zuerst Komponenten im Components-Tab aus."
+            : `${selectedIds.length} Komponente${selectedIds.length === 1 ? "" : "n"} ausgewählt. Die HTML-Datei enthält alle Design-Tokens als CSS Custom Properties.`}
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={() =>
+              handleDownload(
+                htmlOutput,
+                `${project.name.toLowerCase().replace(/\s+/g, "-")}-page.html`,
+                "text/html",
+              )
+            }
+            disabled={selectedIds.length === 0}
+            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
+          >
+            <Download className="size-4" />
+            HTML herunterladen
+          </button>
+          <button
+            onClick={() => handleCopy(htmlOutput, "html")}
+            disabled={selectedIds.length === 0}
+            className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40"
+          >
+            {copied === "html" ? <Check className="size-4 text-green-500" /> : <Copy className="size-4" />}
+            {copied === "html" ? "Kopiert!" : "Kopieren"}
+          </button>
         </div>
       </PanelGroup>
 
-      <div className="flex gap-2">
-        <Button variant="outline" className="flex-1" onClick={handleCopy}>
-          <ClipboardCopy className="size-3.5" />
-          {copied ? "Kopiert!" : "Kopieren"}
-        </Button>
-        <Button className="flex-1" onClick={handleDownload}>
-          <Download className="size-3.5" />
-          Herunterladen
-        </Button>
-      </div>
+      <PanelGroup label="Design-Tokens (JSON)">
+        <p className="text-xs text-muted-foreground mb-3">
+          Alle Farben, Typografie, Abstände und Effekte als strukturiertes JSON.
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={() =>
+              handleDownload(
+                jsonOutput,
+                `${project.name.toLowerCase().replace(/\s+/g, "-")}-tokens.json`,
+                "application/json",
+              )
+            }
+            className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
+          >
+            <FileJson className="size-4" />
+            JSON herunterladen
+          </button>
+          <button
+            onClick={() => handleCopy(jsonOutput, "json")}
+            className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+          >
+            {copied === "json" ? <Check className="size-4 text-green-500" /> : <Copy className="size-4" />}
+            {copied === "json" ? "Kopiert!" : "Kopieren"}
+          </button>
+        </div>
+      </PanelGroup>
+
+      {selectedIds.length > 0 && (
+        <PanelGroup label="Vorschau des HTML-Codes">
+          <div className="relative">
+            <pre className="max-h-80 overflow-auto rounded-lg border bg-muted/50 p-4 text-xs leading-relaxed">
+              <code>{htmlOutput.slice(0, 3000)}{htmlOutput.length > 3000 ? "\n\n/* ... weitere Inhalte ... */" : ""}</code>
+            </pre>
+          </div>
+        </PanelGroup>
+      )}
     </PanelShell>
   );
 }
