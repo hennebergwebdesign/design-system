@@ -12,7 +12,10 @@ import { TypographyPreview } from "./sections/typography-preview";
 import { LogoPreview } from "./sections/logo-preview";
 import { SpacingPreview } from "./sections/spacing-preview";
 import { EffectsPreview } from "./sections/effects-preview";
+import { ComponentsPreview } from "./sections/components-preview";
 import { FontLoader } from "./font-loader";
+import { usePagesStore } from "@/lib/store/pages-store";
+import { useDesignStore } from "@/lib/store/design-store";
 import { cn } from "@/lib/utils";
 
 export function LivePreview({
@@ -69,7 +72,6 @@ export function LivePreview({
   );
 }
 
-// Rendert je nach aktivem Sidebar-Abschnitt die passende Vorschau.
 function PreviewContent({
   system,
   section,
@@ -79,6 +81,9 @@ function PreviewContent({
   section: SectionKey;
   mode: PreviewMode;
 }) {
+  const activeProjectId = useDesignStore((s) => s.activeProjectId);
+  const activePage = usePagesStore((s) => activeProjectId ? s.getActivePage(activeProjectId) : null);
+
   switch (section) {
     case "colors":
       return <ColorsPreview system={system} mode={mode} />;
@@ -90,6 +95,11 @@ function PreviewContent({
       return <SpacingPreview system={system} />;
     case "effects":
       return <EffectsPreview system={system} />;
+    case "generate":
+    case "components":
+      return <ComponentsPreview system={system} page={activePage} />;
+    case "export":
+      return <ComponentsPreview system={system} page={activePage} />;
     default:
       return (
         <div

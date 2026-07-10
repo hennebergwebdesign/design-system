@@ -36,7 +36,7 @@ export function EditorShell({
   projectId: string;
   renderPanel: (section: SectionKey) => React.ReactNode;
 }) {
-  const [section, setSection] = useState<SectionKey>("colors");
+  const [section, setSection] = useState<SectionKey>("generate");
   const hydrated = useDesignStore((s) => s.hydrated);
   const setActiveProject = useDesignStore((s) => s.setActiveProject);
   const undo = useDesignStore((s) => s.undo);
