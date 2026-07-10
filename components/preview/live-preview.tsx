@@ -12,6 +12,7 @@ import { TypographyPreview } from "./sections/typography-preview";
 import { LogoPreview } from "./sections/logo-preview";
 import { SpacingPreview } from "./sections/spacing-preview";
 import { EffectsPreview } from "./sections/effects-preview";
+import { ComponentsPreview } from "./sections/components-preview";
 import { FontLoader } from "./font-loader";
 import { cn } from "@/lib/utils";
 
@@ -90,6 +91,8 @@ function PreviewContent({
       return <SpacingPreview system={system} />;
     case "effects":
       return <EffectsPreview system={system} />;
+    case "components":
+      return <ComponentsPreview system={system} />;
     default:
       return (
         <div
