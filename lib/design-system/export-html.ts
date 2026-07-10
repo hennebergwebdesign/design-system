@@ -92,7 +92,7 @@ function renderComponentHtml(
   const n = (k: string) => slotNumVal(comp, overrides, k);
   const cat = CATEGORY_META[comp.category].label;
 
-  const sectionOpen = `<section class="ds-section" data-component="${comp.id}" data-category="${comp.category}">`;
+  const sectionOpen = `<section class="ds-section ds-reveal" id="sec-${comp.id}" data-component="${comp.id}" data-category="${comp.category}">`;
   const sectionClose = `</section>`;
 
   switch (comp.id) {
@@ -159,9 +159,9 @@ ${sectionClose}`;
       return `${sectionOpen}
   <div class="ds-container ds-surface">
     <div class="ds-stats-grid">
-      <div class="ds-stat"><span class="ds-stat-value">${esc(s("stat1Value"))}</span><span class="ds-stat-label">${esc(s("stat1Label"))}</span></div>
-      <div class="ds-stat"><span class="ds-stat-value">${esc(s("stat2Value"))}</span><span class="ds-stat-label">${esc(s("stat2Label"))}</span></div>
-      <div class="ds-stat"><span class="ds-stat-value">${esc(s("stat3Value"))}</span><span class="ds-stat-label">${esc(s("stat3Label"))}</span></div>
+      <div class="ds-stat"><span class="ds-stat-value" data-countup>${esc(s("stat1Value"))}</span><span class="ds-stat-label">${esc(s("stat1Label"))}</span></div>
+      <div class="ds-stat"><span class="ds-stat-value" data-countup>${esc(s("stat2Value"))}</span><span class="ds-stat-label">${esc(s("stat2Label"))}</span></div>
+      <div class="ds-stat"><span class="ds-stat-value" data-countup>${esc(s("stat3Value"))}</span><span class="ds-stat-label">${esc(s("stat3Label"))}</span></div>
     </div>
   </div>
 ${sectionClose}`;
@@ -628,6 +628,236 @@ ${items}
 ${sectionClose}`;
     }
 
+    case "navbar": {
+      const links = s("links").split(",").map((l) => l.trim()).filter(Boolean);
+      const linksHtml = links.map((l) => `<a href="#" class="ds-nav-link">${esc(l)}</a>`).join("");
+      return `<header class="ds-navbar" data-component="${comp.id}">
+  <a href="#top" class="ds-nav-brand">${esc(s("brand"))}</a>
+  <nav class="ds-nav-links">
+    ${linksHtml}
+    <a href="#" class="ds-btn-primary" style="padding:8px 18px">${esc(s("ctaText"))}</a>
+  </nav>
+</header>`;
+    }
+
+    case "footer": {
+      const columns = n("columns") || 3;
+      const cols = Array.from({ length: columns }).map((_, c) => `      <div class="ds-footer-col">
+        <p class="ds-footer-heading">Spalte ${c + 1}</p>
+        ${[1, 2, 3, 4].map((r) => `<a href="#" class="ds-footer-link">Link ${r}</a>`).join("")}
+      </div>`).join("\n");
+      return `<footer class="ds-footer" data-component="${comp.id}">
+  <div class="ds-container ds-footer-grid">
+    <div class="ds-footer-brandcol">
+      <p class="ds-footer-brand">${esc(s("brand"))}</p>
+      <p class="ds-body ds-muted" style="font-size:13px;margin-top:8px;max-width:260px">${esc(s("tagline"))}</p>
+      <div class="ds-footer-social">
+        ${["in", "X", "f", "ig"].map((i) => `<span class="ds-social-icon">${i}</span>`).join("")}
+      </div>
+    </div>
+${cols}
+  </div>
+  <div class="ds-footer-bottom"><span>${esc(s("copyright"))}</span></div>
+</footer>`;
+    }
+
+    case "cookie-banner":
+      return `<div class="ds-cookie-banner" data-component="${comp.id}" data-cookie>
+  <span class="ds-cookie-text">🍪 ${esc(s("text"))}</span>
+  <div class="ds-cookie-actions">
+    <button class="ds-btn-ghost" style="padding:8px 16px;font-size:13px" data-cookie-close>${esc(s("declineText"))}</button>
+    <button class="ds-btn-primary" style="padding:8px 16px;font-size:13px" data-cookie-close>${esc(s("acceptText"))}</button>
+  </div>
+</div>`;
+
+    case "about-story": {
+      const stat1 = s("stat1");
+      const stat2 = s("stat2");
+      const splitStat = (v: string) => {
+        const parts = v.split(" ");
+        return { num: parts[0], label: parts.slice(1).join(" ") };
+      };
+      const a = splitStat(stat1);
+      const b = splitStat(stat2);
+      return `${sectionOpen}
+  <div class="ds-container ds-about-grid">
+    <div class="ds-about-copy">
+      ${s("eyebrow") ? `<span class="ds-eyebrow">${esc(s("eyebrow"))}</span>` : ""}
+      <h2 class="ds-h2">${esc(s("headline"))}</h2>
+      <p class="ds-body ds-muted" style="margin-top:16px">${esc(s("text"))}</p>
+      <div class="ds-about-stats">
+        <div><p class="ds-about-stat-num">${esc(a.num)}</p><p class="ds-about-stat-label">${esc(a.label)}</p></div>
+        <div><p class="ds-about-stat-num">${esc(b.num)}</p><p class="ds-about-stat-label">${esc(b.label)}</p></div>
+      </div>
+    </div>
+    <div class="ds-about-visual"></div>
+  </div>
+${sectionClose}`;
+    }
+
+    case "timeline": {
+      const count = n("count") || 4;
+      const years = ["2015", "2018", "2021", "2024", "2026"];
+      const items = Array.from({ length: count }).map((_, i) => `      <div class="ds-timeline-item">
+        <div class="ds-timeline-dot"></div>
+        <p class="ds-timeline-year">${years[i % years.length]}</p>
+        <p class="ds-timeline-title">Meilenstein ${i + 1}</p>
+        <p class="ds-body ds-muted" style="font-size:13px;margin-top:4px">Kurze Beschreibung dieses wichtigen Schritts in der Unternehmensgeschichte.</p>
+      </div>`).join("\n");
+      return `${sectionOpen}
+  <div class="ds-container" style="max-width:640px">
+    <h2 class="ds-h2 ds-text-center">${esc(s("headline"))}</h2>
+    <div class="ds-timeline">
+${items}
+    </div>
+  </div>
+${sectionClose}`;
+    }
+
+    case "awards": {
+      const count = n("count") || 5;
+      const badges = Array.from({ length: count }).map((_, i) => `      <div class="ds-award-badge">🏆<span>Award ${i + 1}</span></div>`).join("\n");
+      return `${sectionOpen}
+  <div class="ds-container ds-text-center ds-surface">
+    <h2 class="ds-h2" style="font-size:clamp(18px,2.5vw,26px)">${esc(s("headline"))}</h2>
+    <div class="ds-flex-center" style="gap:24px;margin-top:28px">
+${badges}
+    </div>
+  </div>
+${sectionClose}`;
+    }
+
+    case "services-zigzag": {
+      const count = n("count") || 3;
+      const rows = Array.from({ length: count }).map((_, i) => `    <div class="ds-zigzag-row${i % 2 === 1 ? " ds-reverse" : ""}">
+      <div class="ds-zigzag-visual"></div>
+      <div class="ds-zigzag-copy">
+        <span class="ds-zigzag-num">0${i + 1}</span>
+        <h3 class="ds-h3" style="margin-top:4px">Leistung ${i + 1}</h3>
+        <p class="ds-body ds-muted" style="margin-top:8px">Beschreibung dieser Leistung, ihres Ablaufs und des konkreten Nutzens für den Kunden.</p>
+        <a href="#" class="ds-btn-ghost" style="margin-top:16px">${esc(s("ctaText"))} →</a>
+      </div>
+    </div>`).join("\n");
+      return `${sectionOpen}
+  <div class="ds-container">
+    <h2 class="ds-h2 ds-text-center">${esc(s("headline"))}</h2>
+    <div class="ds-zigzag">
+${rows}
+    </div>
+  </div>
+${sectionClose}`;
+    }
+
+    case "gallery-masonry": {
+      const count = n("count") || 8;
+      const heights = [180, 240, 200, 260, 190, 230, 210, 250];
+      const items = Array.from({ length: count }).map((_, i) => `    <button class="ds-gallery-item" data-lightbox style="height:${heights[i % heights.length]}px">Bild ${i + 1}</button>`).join("\n");
+      return `${sectionOpen}
+  <div class="ds-container">
+    <h2 class="ds-h2 ds-text-center">${esc(s("headline"))}</h2>
+    <div class="ds-masonry">
+${items}
+    </div>
+  </div>
+${sectionClose}`;
+    }
+
+    case "portfolio-filter": {
+      const count = n("count") || 6;
+      const cats = ["Alle", "Web", "Branding", "Foto"];
+      const filterBtns = cats.map((c, i) => `<button class="ds-filter-btn${i === 0 ? " ds-active" : ""}" data-filter="${i === 0 ? "all" : esc(c)}">${esc(c)}</button>`).join("");
+      const cards = Array.from({ length: count }).map((_, i) => {
+        const cat = cats[(i % 3) + 1];
+        return `      <div class="ds-portfolio-card" data-cat="${esc(cat)}">
+        <div class="ds-portfolio-thumb"></div>
+        <div class="ds-portfolio-body"><p class="ds-feature-title">Projekt ${i + 1}</p><p class="ds-body ds-muted" style="font-size:12px">${esc(cat)}</p></div>
+      </div>`;
+      }).join("\n");
+      return `${sectionOpen}
+  <div class="ds-container ds-portfolio" data-portfolio>
+    <h2 class="ds-h2 ds-text-center">${esc(s("headline"))}</h2>
+    <div class="ds-filter-bar">${filterBtns}</div>
+    <div class="ds-portfolio-grid">
+${cards}
+    </div>
+  </div>
+${sectionClose}`;
+    }
+
+    case "contact-form":
+      return `${sectionOpen}
+  <div class="ds-container ds-surface ds-contact-grid">
+    <div class="ds-contact-form-col">
+      <h2 class="ds-h2">${esc(s("headline"))}</h2>
+      <p class="ds-body ds-muted" style="margin-top:8px">${esc(s("subline"))}</p>
+      <form class="ds-contact-form" onsubmit="return false">
+        <div class="ds-field"><label class="ds-label">Name</label><input class="ds-input" type="text"></div>
+        <div class="ds-field"><label class="ds-label">E-Mail</label><input class="ds-input" type="email"></div>
+        <div class="ds-field"><label class="ds-label">Nachricht</label><textarea class="ds-input" rows="4"></textarea></div>
+        <button type="submit" class="ds-btn-primary" style="width:100%">${esc(s("buttonText"))}</button>
+      </form>
+    </div>
+    <div class="ds-contact-map">🗺️ Karte</div>
+  </div>
+${sectionClose}`;
+
+    case "contact-info": {
+      const items = [
+        { icon: "📍", label: "Adresse", value: s("address") },
+        { icon: "📞", label: "Telefon", value: s("phone") },
+        { icon: "✉️", label: "E-Mail", value: s("email") },
+        { icon: "🕒", label: "Öffnungszeiten", value: s("hours") },
+      ];
+      const cards = items.map((it) => `    <div class="ds-card ds-text-center">
+      <div class="ds-contact-icon">${it.icon}</div>
+      <p class="ds-feature-title" style="font-size:13px;margin-top:8px">${esc(it.label)}</p>
+      <p class="ds-body ds-muted" style="font-size:13px;margin-top:2px">${esc(it.value)}</p>
+    </div>`).join("\n");
+      return `${sectionOpen}
+  <div class="ds-container ds-contact-info-grid">
+${cards}
+  </div>
+${sectionClose}`;
+    }
+
+    case "rating-snippet":
+      return `${sectionOpen}
+  <div class="ds-container ds-text-center">
+    <div class="ds-rating-snippet">
+      <span class="ds-rating-platform">${esc(s("platform"))}</span>
+      <span class="ds-stars" style="font-size:22px">★★★★★</span>
+      <span class="ds-rating-value">${esc(s("rating"))}</span>
+      <span class="ds-body ds-muted" style="font-size:13px">aus ${esc(s("reviewCount"))} Bewertungen</span>
+    </div>
+  </div>
+${sectionClose}`;
+
+    case "parallax-hero":
+      return `<section class="ds-parallax-hero" id="sec-${comp.id}" data-component="${comp.id}">
+  <div class="ds-parallax-bg" data-parallax></div>
+  <div class="ds-parallax-content">
+    <h1 class="ds-h1">${esc(s("headline"))}</h1>
+    <p class="ds-body" style="color:var(--ds-text);margin-top:16px;max-width:520px;margin-inline:auto">${esc(s("subline"))}</p>
+    <a href="#" class="ds-btn-primary" style="margin-top:28px">${esc(s("ctaText"))}</a>
+  </div>
+</section>`;
+
+    case "sticky-scroll": {
+      const count = n("count") || 3;
+      const cards = Array.from({ length: count }).map((_, i) => `      <div class="ds-card ds-sticky-item">
+        <div class="ds-sticky-num">${i + 1}</div>
+        <div><p class="ds-feature-title" style="font-size:15px">Schritt ${i + 1}</p><p class="ds-body ds-muted" style="font-size:13px;margin-top:2px">Kurze Erklärung dieses Schritts.</p></div>
+      </div>`).join("\n");
+      return `${sectionOpen}
+  <div class="ds-container ds-sticky-scroll">
+    <div class="ds-sticky-aside"><h2 class="ds-h2">${esc(s("headline"))}</h2><p class="ds-body ds-muted" style="margin-top:8px">Der Text bleibt fixiert, während die Schritte durchscrollen.</p></div>
+    <div class="ds-sticky-steps">
+${cards}
+    </div>
+  </div>
+${sectionClose}`;
+    }
+
     default:
       return `${sectionOpen}
   <div class="ds-container ds-text-center">
@@ -688,6 +918,7 @@ ${cssVarsSection}
 
 /* ═══ Base Reset ═══ */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   font-family: var(--ds-font-body);
   background-color: var(--ds-bg);
@@ -916,6 +1147,114 @@ body {
 /* ═══ Trust Badges ═══ */
 .ds-trust-badge { border: var(--ds-border-w) solid var(--ds-border); border-radius: var(--ds-radius-md); padding: 12px 20px; font-size: 13px; font-weight: 500; color: var(--ds-text); }
 
+/* ═══ Scroll-Reveal (nur mit JS aktiv) ═══ */
+.ds-js .ds-reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.ds-js .ds-reveal.ds-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .ds-js .ds-reveal { opacity: 1; transform: none; transition: none; } }
+
+/* ═══ Lesefortschritt ═══ */
+.ds-progress-top { position: fixed; top: 0; left: 0; height: 3px; width: 0; background-color: var(--ds-primary); z-index: 60; transition: width 0.1s linear; }
+
+/* ═══ Navbar ═══ */
+.ds-navbar { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 24px; background-color: color-mix(in oklab, var(--ds-bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: var(--ds-border-w) solid var(--ds-border); font-family: var(--ds-font-body); flex-wrap: wrap; }
+.ds-nav-brand { font-size: 18px; font-weight: 700; color: var(--ds-text); font-family: var(--ds-font-heading); text-decoration: none; }
+.ds-nav-links { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+.ds-nav-link { font-size: 14px; color: var(--ds-text-muted); text-decoration: none; }
+.ds-nav-link:hover { color: var(--ds-text); }
+
+/* ═══ Footer ═══ */
+.ds-footer { background-color: var(--ds-surface); border-top: var(--ds-border-w) solid var(--ds-border); padding: 48px 24px 24px; font-family: var(--ds-font-body); }
+.ds-footer-grid { display: flex; gap: 40px; flex-wrap: wrap; }
+.ds-footer-brandcol { flex: 1 1 240px; }
+.ds-footer-brand { font-size: 18px; font-weight: 700; color: var(--ds-text); font-family: var(--ds-font-heading); }
+.ds-footer-social { display: flex; gap: 8px; margin-top: 16px; }
+.ds-social-icon { width: 32px; height: 32px; border-radius: var(--ds-radius-md); border: var(--ds-border-w) solid var(--ds-border); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--ds-text-muted); }
+.ds-footer-col { flex: 1 1 140px; display: flex; flex-direction: column; }
+.ds-footer-heading { font-size: 12px; font-weight: 600; color: var(--ds-text); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+.ds-footer-link { font-size: 13px; color: var(--ds-text-muted); text-decoration: none; padding: 4px 0; }
+.ds-footer-link:hover { color: var(--ds-text); }
+.ds-footer-bottom { border-top: var(--ds-border-w) solid var(--ds-border); margin-top: 32px; padding-top: 16px; text-align: center; font-size: 12px; color: var(--ds-text-muted); }
+
+/* ═══ Cookie-Banner ═══ */
+.ds-cookie-banner { position: fixed; bottom: 16px; left: 16px; right: 16px; max-width: 720px; margin-inline: auto; z-index: 55; background-color: var(--ds-bg); border: var(--ds-border-w) solid var(--ds-border); border-radius: var(--ds-radius-lg); box-shadow: var(--ds-shadow-lg); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-family: var(--ds-font-body); }
+.ds-cookie-text { font-size: 13px; color: var(--ds-text); flex: 1 1 240px; }
+.ds-cookie-actions { display: flex; gap: 8px; }
+
+/* ═══ About / Story ═══ */
+.ds-about-grid { display: flex; gap: 40px; align-items: center; flex-wrap: wrap; }
+.ds-about-copy { flex: 1 1 320px; }
+.ds-about-stats { display: flex; gap: 32px; margin-top: 24px; }
+.ds-about-stat-num { font-size: 24px; font-weight: 700; color: var(--ds-primary); font-family: var(--ds-font-heading); }
+.ds-about-stat-label { font-size: 13px; color: var(--ds-text-muted); }
+.ds-about-visual { flex: 1 1 320px; aspect-ratio: 4/3; background-color: var(--ds-surface); border: var(--ds-border-w) solid var(--ds-border); border-radius: var(--ds-radius-lg); }
+
+/* ═══ Timeline ═══ */
+.ds-timeline { margin-top: 40px; position: relative; padding-left: 32px; }
+.ds-timeline::before { content: ""; position: absolute; left: 7px; top: 4px; bottom: 4px; width: 2px; background-color: var(--ds-border); }
+.ds-timeline-item { position: relative; padding-bottom: 28px; }
+.ds-timeline-item:last-child { padding-bottom: 0; }
+.ds-timeline-dot { position: absolute; left: -32px; top: 2px; width: 16px; height: 16px; border-radius: 50%; background-color: var(--ds-primary); border: 3px solid var(--ds-bg); }
+.ds-timeline-year { font-size: 13px; font-weight: 600; color: var(--ds-primary); }
+.ds-timeline-title { font-size: 15px; font-weight: 600; color: var(--ds-text); margin-top: 2px; }
+
+/* ═══ Awards ═══ */
+.ds-award-badge { width: 88px; height: 88px; border-radius: 50%; border: 2px solid var(--ds-border); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 24px; color: var(--ds-text-muted); }
+.ds-award-badge span { font-size: 9px; margin-top: 2px; }
+
+/* ═══ Services Zigzag ═══ */
+.ds-zigzag { display: flex; flex-direction: column; gap: 40px; margin-top: 40px; max-width: 960px; margin-inline: auto; }
+.ds-zigzag-row { display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
+.ds-zigzag-row.ds-reverse { flex-direction: row-reverse; }
+.ds-zigzag-visual { flex: 1 1 260px; aspect-ratio: 16/10; background-color: var(--ds-neutral-100); border-radius: var(--ds-radius-lg); }
+.ds-zigzag-copy { flex: 1 1 260px; }
+.ds-zigzag-num { font-size: 13px; font-weight: 600; color: var(--ds-primary); }
+
+/* ═══ Masonry-Galerie ═══ */
+.ds-masonry { column-width: 200px; column-gap: 12px; margin-top: 32px; }
+.ds-gallery-item { width: 100%; border: none; border-radius: var(--ds-radius-md); margin-bottom: 12px; break-inside: avoid; background-color: var(--ds-neutral-100); color: var(--ds-text-muted); font-size: 13px; font-family: var(--ds-font-body); cursor: pointer; display: block; }
+.ds-gallery-item:hover { opacity: 0.85; }
+
+/* ═══ Portfolio-Filter ═══ */
+.ds-filter-bar { display: flex; gap: 8px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+.ds-filter-btn { padding: 6px 14px; font-size: 13px; font-weight: 500; border-radius: var(--ds-radius-full); border: var(--ds-border-w) solid var(--ds-border); cursor: pointer; font-family: var(--ds-font-body); background-color: transparent; color: var(--ds-text-muted); }
+.ds-filter-btn.ds-active { background-color: var(--ds-primary); color: var(--ds-primary-contrast); border-color: var(--ds-primary); }
+.ds-portfolio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 28px; }
+.ds-portfolio-card { border-radius: var(--ds-radius-lg); overflow: hidden; border: var(--ds-border-w) solid var(--ds-border); }
+.ds-portfolio-thumb { aspect-ratio: 4/3; background-color: var(--ds-neutral-100); }
+.ds-portfolio-body { padding: 12px; }
+
+/* ═══ Kontakt ═══ */
+.ds-contact-grid { display: flex; gap: 32px; flex-wrap: wrap; }
+.ds-contact-form-col { flex: 1 1 300px; }
+.ds-contact-form { margin-top: 20px; }
+.ds-contact-form textarea.ds-input { resize: vertical; }
+.ds-contact-map { flex: 1 1 260px; min-height: 280px; background-color: var(--ds-neutral-100); border-radius: var(--ds-radius-lg); display: flex; align-items: center; justify-content: center; color: var(--ds-text-muted); font-size: 13px; }
+.ds-contact-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.ds-contact-icon { font-size: 28px; }
+
+/* ═══ Rating-Snippet ═══ */
+.ds-rating-snippet { display: inline-flex; align-items: center; gap: 16px; border: var(--ds-border-w) solid var(--ds-border); border-radius: var(--ds-radius-lg); padding: 16px 28px; box-shadow: var(--ds-shadow-sm); flex-wrap: wrap; justify-content: center; }
+.ds-rating-platform { font-size: 15px; font-weight: 600; color: var(--ds-text); font-family: var(--ds-font-body); }
+.ds-rating-value { font-size: 24px; font-weight: 700; color: var(--ds-text); font-family: var(--ds-font-heading); }
+
+/* ═══ Parallax-Hero ═══ */
+.ds-parallax-hero { position: relative; overflow: hidden; padding: clamp(72px, 14vw, 160px) 24px; text-align: center; }
+.ds-parallax-bg { position: absolute; inset: -20% 0; background-image: linear-gradient(135deg, var(--ds-primary-100), var(--ds-primary-400)); will-change: transform; z-index: 0; }
+.ds-parallax-content { position: relative; z-index: 1; }
+.ds-parallax-content .ds-h1 { color: var(--ds-primary-950); }
+
+/* ═══ Sticky-Scroll-Story ═══ */
+.ds-sticky-scroll { display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start; }
+.ds-sticky-aside { flex: 1 1 240px; position: sticky; top: 88px; align-self: flex-start; }
+.ds-sticky-steps { flex: 1 1 320px; display: flex; flex-direction: column; gap: 16px; }
+.ds-sticky-item { display: flex; gap: 16px; align-items: center; }
+.ds-sticky-num { width: 40px; height: 40px; border-radius: 50%; background-color: var(--ds-primary); color: var(--ds-primary-contrast); display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: var(--ds-font-heading); flex-shrink: 0; }
+
+/* ═══ Lightbox ═══ */
+.ds-lightbox { position: fixed; inset: 0; z-index: 70; background-color: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+.ds-lightbox.ds-open { display: flex; }
+.ds-lightbox-img { width: min(80vw, 800px); aspect-ratio: 4/3; background-color: var(--ds-neutral-200); border-radius: var(--ds-radius-lg); display: flex; align-items: center; justify-content: center; color: var(--ds-text-muted); font-family: var(--ds-font-body); }
+
 /* ═══ Responsive ═══ */
 @media (max-width: 768px) {
   .ds-stats-grid { grid-template-columns: 1fr; gap: 24px; }
@@ -923,12 +1262,126 @@ body {
   .ds-pricing-card.ds-recommended { transform: none; }
   .ds-countdown { gap: 8px; }
   .ds-countdown-value { font-size: 24px; padding: 8px 12px; min-width: 50px; }
+  .ds-sticky-aside { position: static; top: auto; }
+  .ds-nav-links { gap: 14px; }
 }
   </style>
 </head>
 <body>
+<span id="top"></span>
+<div class="ds-progress-top"></div>
 
 ${componentsHtml}
+
+<div class="ds-lightbox" id="ds-lightbox"><div class="ds-lightbox-img" id="ds-lightbox-img"></div></div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  root.classList.add("ds-js");
+
+  // Scroll-Reveal
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("ds-in"); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll(".ds-reveal").forEach(function (el) { io.observe(el); });
+  } else {
+    document.querySelectorAll(".ds-reveal").forEach(function (el) { el.classList.add("ds-in"); });
+  }
+
+  // Zahlen hochzählen
+  function parseNum(t) {
+    if (/^\\d{1,3}(\\.\\d{3})+$/.test(t)) return { val: parseInt(t.replace(/\\./g, ""), 10), dec: 0, group: true };
+    if (t.indexOf(",") > -1) { var c = t.replace(/\\./g, "").replace(",", "."); return { val: parseFloat(c), dec: (c.split(".")[1] || "").length, group: false }; }
+    return { val: parseFloat(t), dec: (t.split(".")[1] || "").length, group: false };
+  }
+  function fmt(v, info) {
+    if (info.group) return Math.round(v).toLocaleString("de-DE");
+    return v.toFixed(info.dec);
+  }
+  function countUp(el) {
+    var raw = el.textContent.trim();
+    var m = raw.match(/^(\\D*?)([\\d.,]+)(.*)$/);
+    if (!m) return;
+    var info = parseNum(m[2]);
+    if (isNaN(info.val)) return;
+    var pre = m[1], suf = m[3], start = null, dur = 1400;
+    function step(ts) {
+      if (start === null) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = pre + fmt(info.val * eased, info) + suf;
+      if (p < 1) requestAnimationFrame(step); else el.textContent = pre + fmt(info.val, info) + suf;
+    }
+    requestAnimationFrame(step);
+  }
+  if ("IntersectionObserver" in window) {
+    var cio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { countUp(e.target); cio.unobserve(e.target); } });
+    }, { threshold: 0.5 });
+    document.querySelectorAll("[data-countup]").forEach(function (el) { cio.observe(el); });
+  }
+
+  // Lesefortschritt
+  var bar = document.querySelector(".ds-progress-top");
+  function onScroll() {
+    if (bar) {
+      var max = root.scrollHeight - root.clientHeight;
+      bar.style.width = (max > 0 ? (root.scrollTop / max) * 100 : 0) + "%";
+    }
+    // Parallax
+    px.forEach(function (el) {
+      var host = el.parentElement;
+      var r = host.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < window.innerHeight) {
+        el.style.transform = "translateY(" + (r.top * -0.18) + "px)";
+      }
+    });
+  }
+  var px = document.querySelectorAll("[data-parallax]");
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  // Lightbox
+  var lb = document.getElementById("ds-lightbox");
+  var lbImg = document.getElementById("ds-lightbox-img");
+  document.querySelectorAll("[data-lightbox]").forEach(function (el) {
+    el.addEventListener("click", function () {
+      if (lbImg) lbImg.textContent = el.textContent;
+      if (lb) lb.classList.add("ds-open");
+    });
+  });
+  if (lb) lb.addEventListener("click", function () { lb.classList.remove("ds-open"); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && lb) lb.classList.remove("ds-open"); });
+
+  // Portfolio-Filter
+  document.querySelectorAll("[data-portfolio]").forEach(function (p) {
+    var btns = p.querySelectorAll(".ds-filter-btn");
+    var cards = p.querySelectorAll(".ds-portfolio-card");
+    btns.forEach(function (b) {
+      b.addEventListener("click", function () {
+        btns.forEach(function (x) { x.classList.remove("ds-active"); });
+        b.classList.add("ds-active");
+        var f = b.getAttribute("data-filter");
+        cards.forEach(function (c) {
+          c.style.display = (f === "all" || c.getAttribute("data-cat") === f) ? "" : "none";
+        });
+      });
+    });
+  });
+
+  // Cookie-Banner schließen
+  document.querySelectorAll("[data-cookie-close]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var banner = b.closest("[data-cookie]");
+      if (banner) banner.style.display = "none";
+    });
+  });
+})();
+</script>
 
 </body>
 </html>`;

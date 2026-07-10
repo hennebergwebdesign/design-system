@@ -3,13 +3,18 @@
 // HTML-Template-Funktion, die mit Design-System-Tokens arbeitet.
 
 export type ConversionCategory =
+  | "structure"
   | "hero"
+  | "about"
+  | "services"
   | "social-proof"
+  | "media"
   | "cta"
   | "pricing"
   | "engagement"
   | "urgency"
   | "content"
+  | "contact"
   | "recovery"
   | "trust";
 
@@ -17,9 +22,29 @@ export const CATEGORY_META: Record<
   ConversionCategory,
   { label: string; description: string }
 > = {
+  structure: {
+    label: "Struktur & Navigation",
+    description: "Navbar, Footer, Cookie-Banner – das Seitengerüst",
+  },
   hero: {
     label: "Hero & Above-the-Fold",
     description: "Erste Impression – Value Proposition mit Proof",
+  },
+  about: {
+    label: "Über uns & Story",
+    description: "Firmengeschichte, Werte, Timeline, Auszeichnungen",
+  },
+  services: {
+    label: "Leistungen",
+    description: "Leistungsübersichten und Detail-Layouts",
+  },
+  media: {
+    label: "Galerie & Medien",
+    description: "Bildergalerien, Portfolio, Before/After",
+  },
+  contact: {
+    label: "Kontakt",
+    description: "Kontaktformulare, Standort, Öffnungszeiten",
   },
   "social-proof": {
     label: "Social Proof & Vertrauen",
@@ -56,15 +81,20 @@ export const CATEGORY_META: Record<
 };
 
 export const CATEGORIES_ORDERED: ConversionCategory[] = [
+  "structure",
   "hero",
+  "about",
+  "services",
   "social-proof",
-  "cta",
+  "media",
+  "content",
   "pricing",
   "engagement",
   "urgency",
-  "content",
-  "recovery",
+  "cta",
+  "contact",
   "trust",
+  "recovery",
 ];
 
 export interface ConversionComponentDef {
@@ -566,6 +596,215 @@ export const CONVERSION_COMPONENTS: ConversionComponentDef[] = [
       { key: "headline", label: "Headline", type: "text", default: "100% Zufriedenheitsgarantie" },
       { key: "text", label: "Erklärung", type: "longtext", default: "Testen Sie uns 30 Tage risikofrei. Wenn Sie nicht zufrieden sind, erstatten wir den vollen Betrag – ohne Wenn und Aber." },
       { key: "badgeText", label: "Badge-Text", type: "text", default: "30 Tage" },
+    ],
+  },
+
+  // ── Struktur & Navigation ──────────────────────────────────
+  {
+    id: "navbar",
+    category: "structure",
+    name: "Navbar (Sticky)",
+    description:
+      "Klebende Kopfzeile mit Logo, Anker-Navigation und CTA-Button.",
+    conversionTip:
+      "Eine persistente Navbar mit klarem CTA hält die primäre Aktion jederzeit erreichbar – besonders auf langen One-Pagern.",
+    slots: [
+      { key: "brand", label: "Marke / Logo-Text", type: "text", default: "Ihre Marke" },
+      { key: "links", label: "Menüpunkte (kommagetrennt)", type: "text", default: "Start, Leistungen, Über uns, Referenzen, Kontakt" },
+      { key: "ctaText", label: "CTA Text", type: "text", default: "Termin buchen" },
+    ],
+  },
+  {
+    id: "footer",
+    category: "structure",
+    name: "Footer (mehrspaltig)",
+    description:
+      "Fußzeile mit Marke, Link-Spalten, Newsletter-Feld und Copyright.",
+    conversionTip:
+      "Der Footer ist die letzte Conversion-Chance – eine klare Struktur und ein Newsletter-Feld fangen Besucher ab, die sonst gehen würden.",
+    slots: [
+      { key: "brand", label: "Marke", type: "text", default: "Ihre Marke" },
+      { key: "tagline", label: "Tagline", type: "text", default: "Wir bringen Ihr Projekt nach vorne." },
+      { key: "columns", label: "Anzahl Link-Spalten", type: "number", default: 3 },
+      { key: "copyright", label: "Copyright", type: "text", default: "© 2026 Ihre Marke. Alle Rechte vorbehalten." },
+    ],
+  },
+  {
+    id: "cookie-banner",
+    category: "structure",
+    name: "Cookie-Consent-Banner",
+    description:
+      "DSGVO-konformer Cookie-Hinweis mit Akzeptieren/Ablehnen-Buttons.",
+    conversionTip:
+      "Rechtlich notwendig in der EU. Ein dezentes, nicht-blockierendes Banner stört die Conversion weniger als ein Full-Screen-Overlay.",
+    slots: [
+      { key: "text", label: "Hinweistext", type: "text", default: "Wir verwenden Cookies, um Ihr Erlebnis zu verbessern." },
+      { key: "acceptText", label: "Akzeptieren-Text", type: "text", default: "Alle akzeptieren" },
+      { key: "declineText", label: "Ablehnen-Text", type: "text", default: "Nur notwendige" },
+    ],
+  },
+
+  // ── Über uns & Story ───────────────────────────────────────
+  {
+    id: "about-story",
+    category: "about",
+    name: "Über uns / Story",
+    description:
+      "Zweispaltige Vorstellung mit Text, Kennzahlen und Bildfläche.",
+    conversionTip:
+      "Eine authentische Story schafft emotionale Bindung. Kombiniert mit Kennzahlen wird Vertrauen greifbar.",
+    slots: [
+      { key: "eyebrow", label: "Eyebrow", type: "text", default: "Über uns" },
+      { key: "headline", label: "Headline", type: "text", default: "Seit 2015 an Ihrer Seite" },
+      { key: "text", label: "Fließtext", type: "longtext", default: "Wir sind ein Team aus Spezialisten, das Marken hilft, digital zu wachsen. Aus Leidenschaft für gutes Design und messbare Ergebnisse." },
+      { key: "stat1", label: "Kennzahl 1", type: "text", default: "250+ Projekte" },
+      { key: "stat2", label: "Kennzahl 2", type: "text", default: "40 Experten" },
+    ],
+  },
+  {
+    id: "timeline",
+    category: "about",
+    name: "Firmen-Timeline",
+    description:
+      "Vertikale Zeitleiste mit Meilensteinen der Firmengeschichte.",
+    conversionTip:
+      "Eine Timeline visualisiert Beständigkeit und Wachstum – ein starkes Vertrauenssignal für langfristige Partnerschaften.",
+    slots: [
+      { key: "headline", label: "Überschrift", type: "text", default: "Unser Weg" },
+      { key: "count", label: "Anzahl Meilensteine", type: "number", default: 4 },
+    ],
+  },
+  {
+    id: "awards",
+    category: "about",
+    name: "Auszeichnungen & Zertifikate",
+    description:
+      "Leiste mit Award-Badges, Zertifizierungen und Mitgliedschaften.",
+    conversionTip:
+      "Externe Validierung durch Dritte ist glaubwürdiger als Eigenlob – Auszeichnungen senken das wahrgenommene Risiko.",
+    slots: [
+      { key: "headline", label: "Überschrift", type: "text", default: "Ausgezeichnet & zertifiziert" },
+      { key: "count", label: "Anzahl Badges", type: "number", default: 5 },
+    ],
+  },
+
+  // ── Leistungen ─────────────────────────────────────────────
+  {
+    id: "services-zigzag",
+    category: "services",
+    name: "Leistungen (Zigzag)",
+    description:
+      "Alternierende Bild/Text-Blöcke je Leistung – ideal zum Erklären.",
+    conversionTip:
+      "Das Zigzag-Layout hält den Blick in Bewegung und erlaubt es, jede Leistung mit Kontext und Nutzen zu erklären.",
+    slots: [
+      { key: "headline", label: "Überschrift", type: "text", default: "Unsere Leistungen" },
+      { key: "count", label: "Anzahl Leistungen", type: "number", default: 3 },
+      { key: "ctaText", label: "CTA je Block", type: "text", default: "Mehr erfahren" },
+    ],
+  },
+
+  // ── Galerie & Medien ───────────────────────────────────────
+  {
+    id: "gallery-masonry",
+    category: "media",
+    name: "Masonry-Galerie mit Lightbox",
+    description:
+      "Versetztes Bilder-Raster; Klick öffnet das Bild im Lightbox-Overlay.",
+    conversionTip:
+      "Visuelle Beweise (echte Arbeiten, Produkte, Events) überzeugen stärker als Beschreibungen. Die Lightbox hält Besucher auf der Seite.",
+    slots: [
+      { key: "headline", label: "Überschrift", type: "text", default: "Einblicke & Arbeiten" },
+      { key: "count", label: "Anzahl Bilder", type: "number", default: 8 },
+    ],
+  },
+  {
+    id: "portfolio-filter",
+    category: "media",
+    name: "Portfolio mit Filter",
+    description:
+      "Projekt-Grid mit Kategorie-Filter zum interaktiven Eingrenzen.",
+    conversionTip:
+      "Ein Filter gibt Besuchern Kontrolle und führt sie schneller zu relevanten Referenzen – höhere Verweildauer, mehr Anfragen.",
+    slots: [
+      { key: "headline", label: "Überschrift", type: "text", default: "Ausgewählte Projekte" },
+      { key: "count", label: "Anzahl Projekte", type: "number", default: 6 },
+    ],
+  },
+
+  // ── Kontakt ────────────────────────────────────────────────
+  {
+    id: "contact-form",
+    category: "contact",
+    name: "Kontaktformular",
+    description:
+      "Formular mit Feldern, Absende-Button und Kartenfläche daneben.",
+    conversionTip:
+      "Wenige Pflichtfelder erhöhen die Absendequote deutlich. Eine Karte daneben schafft lokales Vertrauen.",
+    slots: [
+      { key: "headline", label: "Überschrift", type: "text", default: "Lassen Sie uns sprechen" },
+      { key: "subline", label: "Subline", type: "text", default: "Wir melden uns innerhalb von 24 Stunden." },
+      { key: "buttonText", label: "Button-Text", type: "text", default: "Nachricht senden" },
+    ],
+  },
+  {
+    id: "contact-info",
+    category: "contact",
+    name: "Standort & Öffnungszeiten",
+    description:
+      "Info-Karten mit Adresse, Telefon, E-Mail und Öffnungszeiten.",
+    conversionTip:
+      "Konkrete Kontaktdaten und Öffnungszeiten signalisieren ein echtes, erreichbares Unternehmen – wichtig für lokale Conversions.",
+    slots: [
+      { key: "address", label: "Adresse", type: "text", default: "Musterstraße 1, 12345 Stadt" },
+      { key: "phone", label: "Telefon", type: "text", default: "+49 123 456789" },
+      { key: "email", label: "E-Mail", type: "text", default: "hallo@ihre-marke.de" },
+      { key: "hours", label: "Öffnungszeiten", type: "text", default: "Mo–Fr 9–18 Uhr" },
+    ],
+  },
+
+  // ── Trust (zusätzlich) ─────────────────────────────────────
+  {
+    id: "rating-snippet",
+    category: "trust",
+    name: "Bewertungs-Snippet",
+    description:
+      "Kompakte Bewertungsanzeige à la Google/Trustpilot mit Sternen.",
+    conversionTip:
+      "Aggregierte Bewertungen von bekannten Plattformen sind eines der stärksten Vertrauenssignale kurz vor der Conversion.",
+    slots: [
+      { key: "platform", label: "Plattform", type: "text", default: "Google Bewertungen" },
+      { key: "rating", label: "Bewertung", type: "text", default: "4.9" },
+      { key: "reviewCount", label: "Anzahl Bewertungen", type: "text", default: "312" },
+    ],
+  },
+
+  // ── Scroll-Trigger & Bewegung ──────────────────────────────
+  {
+    id: "parallax-hero",
+    category: "hero",
+    name: "Parallax-Hero",
+    description:
+      "Hero mit Hintergrund, der sich beim Scrollen langsamer bewegt.",
+    conversionTip:
+      "Parallax erzeugt Tiefe und Premium-Anmutung. Dezent eingesetzt steigert es die wahrgenommene Wertigkeit.",
+    slots: [
+      { key: "headline", label: "Headline", type: "text", default: "Erleben Sie den Unterschied" },
+      { key: "subline", label: "Subline", type: "text", default: "Design, das in Erinnerung bleibt." },
+      { key: "ctaText", label: "CTA Text", type: "text", default: "Jetzt entdecken" },
+    ],
+  },
+  {
+    id: "sticky-scroll",
+    category: "engagement",
+    name: "Sticky-Scroll-Story",
+    description:
+      "Text bleibt fixiert, während zugehörige Bilder durchscrollen.",
+    conversionTip:
+      "Sticky-Scroll-Storytelling erhöht die Verweildauer stark und führt den Besucher fokussiert durch mehrere Kernbotschaften.",
+    slots: [
+      { key: "headline", label: "Überschrift", type: "text", default: "So funktioniert's" },
+      { key: "count", label: "Anzahl Schritte", type: "number", default: 3 },
     ],
   },
 ];
