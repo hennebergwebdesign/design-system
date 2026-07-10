@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, FileCode, FileJson, Copy, Check } from "lucide-react";
+import { Download, FileJson, Copy, Check } from "lucide-react";
 import { PanelShell, PanelGroup } from "./panel-shell";
 import { useDesignSystem } from "@/lib/store/design-store";
 import { useActiveProject } from "@/lib/store/design-store";

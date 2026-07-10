@@ -3,7 +3,7 @@
 // Wiederverwendbares Farbfeld: Swatch öffnet einen Color Picker (react-colorful),
 // daneben ein Hex-Input mit Validierung.
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import { isValidHex } from "@/lib/design-system/color";
 import { Input } from "@/components/ui/input";
@@ -25,10 +25,13 @@ export function ColorField({
   onChange: (hex: string) => void;
 }) {
   const [text, setText] = useState(value);
-
-  useEffect(() => {
+  // Lokalen Text mit dem value-Prop synchronisieren (z. B. bei Undo/Redo),
+  // ohne setState im Effect: Zustand beim Rendern anpassen, wenn sich value ändert.
+  const [prevValue, setPrevValue] = useState(value);
+  if (value !== prevValue) {
+    setPrevValue(value);
     setText(value);
-  }, [value]);
+  }
 
   const commitText = (raw: string) => {
     const hex = normalizeHex(raw);
