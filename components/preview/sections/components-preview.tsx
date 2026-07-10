@@ -138,7 +138,7 @@ function ComponentRenderer({
     default:
       return (
         <div style={{ ...section, textAlign: "center", color: "var(--ds-text-muted)" }}>
-          Vorschau für „{comp.name}" folgt.
+          Vorschau für „{comp.name}“ folgt.
         </div>
       );
   }

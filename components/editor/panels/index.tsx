@@ -1,7 +1,6 @@
 "use client";
 
 import type { SectionKey } from "@/lib/design-system/types";
-import { PanelShell } from "./panel-shell";
 import { ColorsPanel } from "./colors-panel";
 import { TypographyPanel } from "./typography-panel";
 import { LogoPanel } from "./logo-panel";

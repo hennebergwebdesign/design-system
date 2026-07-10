@@ -46,7 +46,7 @@ export function ProjectsOverview() {
     const id = createProject(newName);
     setNewName("");
     setCreateOpen(false);
-    router.push(`/editor/${id}`);
+    router.push(`/editor?project=${id}`);
   };
 
   if (!hydrated) {
@@ -113,7 +113,7 @@ export function ProjectsOverview() {
               <Card
                 key={project.id}
                 className="group cursor-pointer gap-0 overflow-hidden p-0 transition-shadow hover:shadow-md"
-                onClick={() => router.push(`/editor/${project.id}`)}
+                onClick={() => router.push(`/editor?project=${project.id}`)}
               >
                 <div className="flex h-20">
                   {(["300", "400", "500", "600", "700"] as const).map((step) => (

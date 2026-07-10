@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Sparkles, Wand2, Check } from "lucide-react";
 import { PanelShell, PanelGroup } from "./panel-shell";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useDesignStore } from "@/lib/store/design-store";
 import { usePagesStore } from "@/lib/store/pages-store";
 import { DESIGN_PRESETS, type DesignPreset } from "@/lib/design-system/presets";
