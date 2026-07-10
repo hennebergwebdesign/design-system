@@ -83,6 +83,8 @@ function ComponentRenderer({
   switch (comp.id) {
     case "hero-proof":
       return <HeroProof s={s} />;
+    case "hero-split":
+      return <HeroSplit s={s} />;
     case "hero-video":
       return <HeroVideo s={s} />;
     case "announcement-bar":
@@ -91,6 +93,8 @@ function ComponentRenderer({
       return <TestimonialWall s={s} n={n} />;
     case "video-testimonial":
       return <VideoTestimonial s={s} />;
+    case "team-showcase":
+      return <TeamShowcase s={s} n={n} />;
     case "logo-ticker":
       return <LogoTicker s={s} n={n} />;
     case "case-study-cards":
@@ -101,6 +105,8 @@ function ComponentRenderer({
       return <StickyCta s={s} />;
     case "dual-cta":
       return <DualCta s={s} />;
+    case "newsletter-signup":
+      return <NewsletterSignup s={s} />;
     case "contextual-cta":
       return <ContextualCta s={s} />;
     case "pricing-anchored":
@@ -123,6 +129,12 @@ function ComponentRenderer({
       return <LimitedAvailability s={s} n={n} />;
     case "pas-narrative":
       return <PasNarrative s={s} />;
+    case "feature-grid":
+      return <FeatureGrid s={s} n={n} />;
+    case "process-steps":
+      return <ProcessSteps s={s} n={n} />;
+    case "blog-teasers":
+      return <BlogTeasers s={s} n={n} />;
     case "stats-showcase":
       return <StatsShowcase s={s} />;
     case "faq-schema":
@@ -772,6 +784,164 @@ function GuaranteeSection({ s }: SP) {
         padding: "6px 16px", fontSize: 13, fontWeight: 600, color: "var(--ds-success-800)",
       }}>
         {s("badgeText")} Geld-zurück-Garantie
+      </div>
+    </div>
+  );
+}
+
+function HeroSplit({ s }: SP) {
+  return (
+    <div style={{ ...section, backgroundColor: "var(--ds-bg)" }}>
+      <div style={{ display: "flex", gap: 40, alignItems: "center", flexWrap: "wrap", maxWidth: 1080, marginInline: "auto" }}>
+        <div style={{ flex: "1 1 320px" }}>
+          {s("eyebrow") && (
+            <span style={{
+              display: "inline-block", fontSize: 12, fontWeight: 600, color: "var(--ds-primary)",
+              textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12,
+            }}>
+              {s("eyebrow")}
+            </span>
+          )}
+          <h1 style={h1Style}>{s("headline")}</h1>
+          <p style={{ ...bodyStyle, marginTop: 16, maxWidth: 480 }}>{s("subline")}</p>
+          <div style={{ display: "flex", gap: 12, marginTop: 28, flexWrap: "wrap" }}>
+            <button style={primaryBtn}>{s("ctaText")}</button>
+            <button style={ghostBtn}>{s("ctaSecondary")}</button>
+          </div>
+        </div>
+        <div style={{
+          flex: "1 1 320px", aspectRatio: "4/3", backgroundColor: "var(--ds-surface)",
+          border: "var(--ds-border-w) solid var(--ds-border)", borderRadius: "var(--ds-radius-lg)",
+          display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "var(--ds-shadow-md)",
+        }}>
+          <span style={{ fontSize: 13, color: "var(--ds-text-muted)" }}>Produkt-Visual</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TeamShowcase({ s, n }: SNP) {
+  const count = n("count") || 4;
+  return (
+    <div style={section}>
+      <h2 style={{ ...h2Style, textAlign: "center" }}>{s("headline")}</h2>
+      <p style={{ ...bodyStyle, textAlign: "center", marginTop: 8 }}>{s("subline")}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 20, marginTop: 32 }}>
+        {Array.from({ length: count }).map((_, i) => (
+          <div key={i} style={{ ...cardStyle, textAlign: "center" }}>
+            <div style={{ width: 72, height: 72, borderRadius: "50%", backgroundColor: "var(--ds-primary-100)", margin: "0 auto 12px" }} />
+            <p style={{ fontSize: 15, fontWeight: 600, color: "var(--ds-text)" }}>Teammitglied {i + 1}</p>
+            <p style={{ fontSize: 13, color: "var(--ds-text-muted)", marginTop: 2 }}>Position {i + 1}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function NewsletterSignup({ s }: SP) {
+  return (
+    <div style={{ ...section, textAlign: "center", backgroundColor: "var(--ds-primary-50)" }}>
+      <div style={{ maxWidth: 520, marginInline: "auto" }}>
+        <h2 style={h2Style}>{s("headline")}</h2>
+        <p style={{ ...bodyStyle, marginTop: 8 }}>{s("subline")}</p>
+        <div style={{ display: "flex", gap: 8, marginTop: 24, flexWrap: "wrap", justifyContent: "center" }}>
+          <div style={{ ...inputStyle, flex: "1 1 220px", maxWidth: 320, textAlign: "left", color: "var(--ds-text-muted)" }}>
+            {s("placeholder")}
+          </div>
+          <button style={primaryBtn}>{s("ctaText")}</button>
+        </div>
+        <p style={{ fontSize: 12, color: "var(--ds-text-muted)", marginTop: 12 }}>{s("microcopy")}</p>
+      </div>
+    </div>
+  );
+}
+
+function FeatureGrid({ s, n }: SNP) {
+  const count = n("count") || 6;
+  const icons = ["⚡", "🔒", "📊", "🔗", "🎯", "🛠️", "🚀", "💬"];
+  return (
+    <div style={section}>
+      <h2 style={{ ...h2Style, textAlign: "center" }}>{s("headline")}</h2>
+      <p style={{ ...bodyStyle, textAlign: "center", marginTop: 8 }}>{s("subline")}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 20, marginTop: 32 }}>
+        {Array.from({ length: count }).map((_, i) => (
+          <div key={i} style={cardStyle}>
+            <div style={{
+              width: 44, height: 44, borderRadius: "var(--ds-radius-md)", backgroundColor: "var(--ds-primary-100)",
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 12,
+            }}>
+              {icons[i % icons.length]}
+            </div>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--ds-text)", fontFamily: "var(--ds-font-heading)" }}>
+              Feature {i + 1}
+            </h3>
+            <p style={{ fontSize: 13, color: "var(--ds-text-muted)", marginTop: 6, lineHeight: 1.5 }}>
+              Kurze, nutzenorientierte Beschreibung dieses Features und seines Vorteils.
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ProcessSteps({ s, n }: SNP) {
+  const count = n("count") || 3;
+  return (
+    <div style={{ ...section, backgroundColor: "var(--ds-surface)", textAlign: "center" }}>
+      <h2 style={h2Style}>{s("headline")}</h2>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fit, minmax(200px, 1fr))`, gap: 24, marginTop: 40 }}>
+        {Array.from({ length: count }).map((_, i) => (
+          <div key={i} style={{ textAlign: "center" }}>
+            <div style={{
+              width: 48, height: 48, borderRadius: "50%", backgroundColor: "var(--ds-primary)",
+              color: "var(--ds-primary-contrast)", fontSize: 20, fontWeight: 700, fontFamily: "var(--ds-font-heading)",
+              display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px",
+            }}>
+              {i + 1}
+            </div>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--ds-text)", fontFamily: "var(--ds-font-heading)" }}>
+              Schritt {i + 1}
+            </h3>
+            <p style={{ fontSize: 13, color: "var(--ds-text-muted)", marginTop: 6, lineHeight: 1.5, maxWidth: 240, marginInline: "auto" }}>
+              Kurze Erklärung, was in diesem Schritt passiert und wie einfach es ist.
+            </p>
+          </div>
+        ))}
+      </div>
+      <button style={{ ...primaryBtn, marginTop: 32 }}>{s("ctaText")}</button>
+    </div>
+  );
+}
+
+function BlogTeasers({ s, n }: SNP) {
+  const count = n("count") || 3;
+  const categories = ["Guide", "Case Study", "Update", "Tutorial"];
+  return (
+    <div style={section}>
+      <h2 style={{ ...h2Style, textAlign: "center" }}>{s("headline")}</h2>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 20, marginTop: 32 }}>
+        {Array.from({ length: count }).map((_, i) => (
+          <div key={i} style={{ ...cardStyle, padding: 0, overflow: "hidden" }}>
+            <div style={{ aspectRatio: "16/9", backgroundColor: "var(--ds-neutral-100)" }} />
+            <div style={{ padding: 16 }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: "var(--ds-primary)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                {categories[i % categories.length]}
+              </span>
+              <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--ds-text)", fontFamily: "var(--ds-font-heading)", marginTop: 6 }}>
+                Titel des Artikels {i + 1}
+              </h3>
+              <p style={{ fontSize: 13, color: "var(--ds-text-muted)", marginTop: 6, lineHeight: 1.5 }}>
+                Ein kurzer Anrisstext, der neugierig macht und zum Weiterlesen einlädt.
+              </p>
+              <span style={{ fontSize: 13, color: "var(--ds-primary)", fontWeight: 500, marginTop: 12, display: "inline-block" }}>
+                Weiterlesen →
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

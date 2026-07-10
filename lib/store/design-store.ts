@@ -45,6 +45,17 @@ interface DesignStore {
 
   setHydrated: () => void;
 
+  /**
+   * Ersetzt bzw. ergänzt die Projekte aus einem Backup. Bei `merge` bleiben
+   * bestehende Projekte erhalten (Backup gewinnt bei ID-Kollision), sonst
+   * werden alle vorhandenen Projekte ersetzt.
+   */
+  restoreProjects: (
+    projects: Record<string, Project>,
+    activeProjectId: string | null,
+    merge: boolean,
+  ) => void;
+
   /** Ändert das aktive Design System und legt einen Undo-Schritt an. */
   update: (mutate: (draft: DesignSystem) => void) => void;
   resetSection: (section: ResettableSection) => void;
@@ -66,6 +77,26 @@ export const useDesignStore = create<DesignStore>()(
       future: [],
 
       setHydrated: () => set({ hydrated: true }),
+
+      restoreProjects: (projects, activeProjectId, merge) => {
+        set((s) => {
+          const nextProjects = merge
+            ? { ...s.projects, ...projects }
+            : { ...projects };
+          const active =
+            activeProjectId && nextProjects[activeProjectId]
+              ? activeProjectId
+              : merge
+                ? s.activeProjectId
+                : null;
+          return {
+            projects: nextProjects,
+            activeProjectId: active,
+            past: [],
+            future: [],
+          };
+        });
+      },
 
       createProject: (name) => {
         const id = newId();

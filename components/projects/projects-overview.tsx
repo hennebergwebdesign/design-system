@@ -2,10 +2,19 @@
 
 // Übersichtsseite: alle gespeicherten Design-System-Projekte verwalten.
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Copy, Palette, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  Copy,
+  Download,
+  Palette,
+  Pencil,
+  Plus,
+  Trash2,
+  Upload,
+} from "lucide-react";
 import { useDesignStore } from "@/lib/store/design-store";
+import { applyBackup, downloadBackup, parseBackup } from "@/lib/design-system/backup";
 import { generateScale } from "@/lib/design-system/color";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,8 +48,41 @@ export function ProjectsOverview() {
   const [createOpen, setCreateOpen] = useState(false);
   const [renameId, setRenameId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const list = Object.values(projects).sort((a, b) => b.updatedAt - a.updatedAt);
+  const hasProjects = list.length > 0;
+
+  const handleImportFile = async (file: File) => {
+    const text = await file.text();
+    const result = parseBackup(text);
+    if (!result.ok || !result.data) {
+      alert(result.error ?? "Backup konnte nicht gelesen werden.");
+      return;
+    }
+    const count = result.projectCount ?? 0;
+    let merge = false;
+    if (hasProjects) {
+      // OK = zusammenführen, Abbrechen = ersetzen
+      merge = confirm(
+        `Backup mit ${count} Projekt(en) gefunden.\n\n` +
+          "„OK“: zu den vorhandenen Projekten hinzufügen.\n" +
+          "„Abbrechen“: alle vorhandenen Projekte ersetzen.",
+      );
+      if (!merge) {
+        const sure = confirm(
+          "Wirklich ALLE vorhandenen Projekte durch das Backup ersetzen?",
+        );
+        if (!sure) return;
+      }
+    }
+    applyBackup(result.data, merge);
+    alert(
+      merge
+        ? `${count} Projekt(e) hinzugefügt.`
+        : `Backup wiederhergestellt (${count} Projekt(e)).`,
+    );
+  };
 
   const handleCreate = () => {
     const id = createProject(newName);
@@ -73,26 +115,66 @@ export function ProjectsOverview() {
             Design System als CSS, Tailwind, JSON oder Styleguide.
           </p>
         </div>
-        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-          <DialogTrigger render={<Button size="lg" />}>
-            <Plus /> Neues Projekt
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Neues Design-System-Projekt</DialogTitle>
-            </DialogHeader>
-            <Input
-              autoFocus
-              placeholder="Projektname, z. B. „Kunde Website 2026“"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-            />
-            <DialogFooter>
-              <Button onClick={handleCreate}>Projekt anlegen</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <div className="flex items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleImportFile(file);
+              e.target.value = "";
+            }}
+          />
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Upload /> Wiederherstellen
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={downloadBackup}
+            disabled={!hasProjects}
+          >
+            <Download /> Sichern
+          </Button>
+          <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+            <DialogTrigger render={<Button size="lg" />}>
+              <Plus /> Neues Projekt
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Neues Design-System-Projekt</DialogTitle>
+              </DialogHeader>
+              <Input
+                autoFocus
+                placeholder="Projektname, z. B. „Kunde Website 2026“"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+              />
+              <DialogFooter>
+                <Button onClick={handleCreate}>Projekt anlegen</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      <div className="mb-8 flex items-start gap-2 rounded-lg border border-dashed bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+        <Download className="mt-0.5 size-4 shrink-0" />
+        <p>
+          Deine Projekte werden im Browser-Speicher gehalten. Wird der Browser-Cache
+          geleert, gehen sie verloren.{" "}
+          <span className="font-medium text-foreground">
+            Lade dir mit „Sichern“ regelmäßig ein Backup herunter
+          </span>{" "}
+          und stelle es bei Bedarf mit „Wiederherstellen“ wieder her.
+        </p>
       </div>
 
       {list.length === 0 ? (
