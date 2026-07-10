@@ -104,6 +104,22 @@ export const CONVERSION_COMPONENTS: ConversionComponentDef[] = [
     ],
   },
   {
+    id: "hero-split",
+    category: "hero",
+    name: "Split-Hero mit Bild",
+    description:
+      "Zweispaltiger Hero: Value Proposition links, Produkt-/Bildfläche rechts.",
+    conversionTip:
+      "Der visuelle Kontext rechts verankert die Botschaft. Ideal für Produkte, deren Nutzen sich zeigen lässt.",
+    slots: [
+      { key: "eyebrow", label: "Eyebrow / Kicker", type: "text", default: "Neu · 2026" },
+      { key: "headline", label: "Headline", type: "text", default: "Weniger Aufwand. Mehr Ergebnis." },
+      { key: "subline", label: "Subline", type: "text", default: "Automatisieren Sie wiederkehrende Aufgaben und gewinnen Sie Zeit für das Wesentliche." },
+      { key: "ctaText", label: "CTA Text", type: "text", default: "Kostenlos starten" },
+      { key: "ctaSecondary", label: "Sekundärer CTA", type: "text", default: "Mehr erfahren" },
+    ],
+  },
+  {
     id: "hero-video",
     category: "hero",
     name: "Hero mit Video/Demo-Preview",
@@ -186,6 +202,20 @@ export const CONVERSION_COMPONENTS: ConversionComponentDef[] = [
     ],
   },
   {
+    id: "team-showcase",
+    category: "social-proof",
+    name: "Team-Vorstellung",
+    description:
+      "Karten-Grid mit Fotos, Namen und Rollen der Teammitglieder.",
+    conversionTip:
+      "Echte Gesichter schaffen Nähe und Vertrauen – besonders wirksam bei Dienstleistungen und Beratung.",
+    slots: [
+      { key: "headline", label: "Überschrift", type: "text", default: "Das Team hinter der Lösung" },
+      { key: "subline", label: "Subline", type: "text", default: "Erfahrene Menschen, die für Ihren Erfolg arbeiten." },
+      { key: "count", label: "Anzahl Personen", type: "number", default: 4 },
+    ],
+  },
+  {
     id: "live-activity",
     category: "social-proof",
     name: "Live-Aktivitäts-Feed",
@@ -227,6 +257,22 @@ export const CONVERSION_COMPONENTS: ConversionComponentDef[] = [
       { key: "primaryCta", label: "Primärer CTA", type: "text", default: "Kostenlos starten" },
       { key: "secondaryCta", label: "Sekundärer CTA", type: "text", default: "Demo ansehen" },
       { key: "microcopy", label: "Microcopy", type: "text", default: "Keine Kreditkarte nötig · Jederzeit kündbar" },
+    ],
+  },
+  {
+    id: "newsletter-signup",
+    category: "cta",
+    name: "Newsletter / E-Mail-Capture",
+    description:
+      "Fokussierte Sektion mit Inline-E-Mail-Feld und Reassurance-Microcopy.",
+    conversionTip:
+      "Ein einzelnes Feld senkt die Einstiegshürde. Klarer Nutzenversprechen + Datenschutz-Hinweis maximieren Opt-ins.",
+    slots: [
+      { key: "headline", label: "Headline", type: "text", default: "Bleiben Sie auf dem Laufenden" },
+      { key: "subline", label: "Subline", type: "text", default: "Praxis-Tipps und Updates – alle zwei Wochen, kein Spam." },
+      { key: "placeholder", label: "Feld-Placeholder", type: "text", default: "Ihre E-Mail-Adresse" },
+      { key: "ctaText", label: "CTA Text", type: "text", default: "Abonnieren" },
+      { key: "microcopy", label: "Microcopy", type: "text", default: "Jederzeit abbestellbar · Kein Spam" },
     ],
   },
   {
@@ -407,6 +453,47 @@ export const CONVERSION_COMPONENTS: ConversionComponentDef[] = [
       { key: "stat2Label", label: "Stat 2 Label", type: "text", default: "Verfügbarkeit" },
       { key: "stat3Value", label: "Stat 3 Wert", type: "text", default: "4.9★" },
       { key: "stat3Label", label: "Stat 3 Label", type: "text", default: "Durchschnittliche Bewertung" },
+    ],
+  },
+  {
+    id: "feature-grid",
+    category: "content",
+    name: "Feature-Grid mit Icons",
+    description:
+      "Übersichtliches Raster aus Feature-Karten mit Icon, Titel und Kurzbeschreibung.",
+    conversionTip:
+      "Benefit-orientierte Kurztexte statt technischer Feature-Listen erhöhen die Verständlichkeit und das Vertrauen.",
+    slots: [
+      { key: "headline", label: "Überschrift", type: "text", default: "Alles, was Sie brauchen" },
+      { key: "subline", label: "Subline", type: "text", default: "Leistungsstarke Funktionen, die sofort einen Unterschied machen." },
+      { key: "count", label: "Anzahl Features", type: "number", default: 6 },
+    ],
+  },
+  {
+    id: "process-steps",
+    category: "content",
+    name: "So funktioniert's (Schritte)",
+    description:
+      "Nummerierte Schritt-für-Schritt-Erklärung des Ablaufs oder Onboardings.",
+    conversionTip:
+      "Ein klarer, einfacher Ablauf reduziert wahrgenommene Komplexität und senkt die Einstiegshürde.",
+    slots: [
+      { key: "headline", label: "Überschrift", type: "text", default: "In 3 Schritten startklar" },
+      { key: "count", label: "Anzahl Schritte", type: "number", default: 3 },
+      { key: "ctaText", label: "CTA Text", type: "text", default: "Jetzt loslegen" },
+    ],
+  },
+  {
+    id: "blog-teasers",
+    category: "content",
+    name: "Blog- / Ressourcen-Teaser",
+    description:
+      "Karten-Grid mit Vorschaubild, Kategorie, Titel und Anrisstext für Artikel.",
+    conversionTip:
+      "Content-Teaser halten Besucher länger auf der Seite und stärken Ihre Autorität im Thema.",
+    slots: [
+      { key: "headline", label: "Überschrift", type: "text", default: "Aus dem Magazin" },
+      { key: "count", label: "Anzahl Artikel", type: "number", default: 3 },
     ],
   },
   {

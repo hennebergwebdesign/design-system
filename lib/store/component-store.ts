@@ -15,6 +15,10 @@ interface ComponentStore {
     value: string | number | boolean,
   ) => void;
   clearAll: () => void;
+  restoreSelection: (
+    selectedIds: string[],
+    slotOverrides: Record<string, Record<string, string | number | boolean>>,
+  ) => void;
 }
 
 export const useComponentStore = create<ComponentStore>()(
@@ -52,6 +56,9 @@ export const useComponentStore = create<ComponentStore>()(
         })),
 
       clearAll: () => set({ selectedIds: [], slotOverrides: {} }),
+
+      restoreSelection: (selectedIds, slotOverrides) =>
+        set({ selectedIds, slotOverrides }),
     }),
     {
       name: "conversion-components-selection",

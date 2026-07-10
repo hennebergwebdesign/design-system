@@ -67,7 +67,7 @@ export function FontPicker({
               />
             </div>
             <div className="mt-2 flex gap-1">
-              {[null, "sans-serif", "serif", "monospace"].map((cat) => (
+              {[null, "sans-serif", "serif", "monospace", "cursive"].map((cat) => (
                 <button
                   key={cat ?? "all"}
                   type="button"
