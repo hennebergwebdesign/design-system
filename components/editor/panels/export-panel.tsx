@@ -81,7 +81,7 @@ export function ExportPanel() {
       <PanelGroup label="HTML-Seite">
         <p className="text-xs text-muted-foreground mb-3">
           {selectedIds.length === 0
-            ? "Wählen Sie zuerst Komponenten im „Components"-Tab aus."
+            ? "Wählen Sie zuerst Komponenten im Components-Tab aus."
             : `${selectedIds.length} Komponente${selectedIds.length === 1 ? "" : "n"} ausgewählt. Die HTML-Datei enthält alle Design-Tokens als CSS Custom Properties.`}
         </p>
         <div className="flex gap-2">
