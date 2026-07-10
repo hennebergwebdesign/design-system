@@ -1,26 +1,19 @@
 "use client";
 
 import type { SectionKey } from "@/lib/design-system/types";
-import { PanelShell } from "./panel-shell";
 import { ColorsPanel } from "./colors-panel";
 import { TypographyPanel } from "./typography-panel";
 import { LogoPanel } from "./logo-panel";
 import { SpacingPanel } from "./spacing-panel";
 import { EffectsPanel } from "./effects-panel";
-
-// Die einzelnen Panels werden Modul für Modul ergänzt.
-function PlaceholderPanel({ title }: { title: string }) {
-  return (
-    <PanelShell title={title} description="Dieses Modul folgt in Kürze.">
-      <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-        Noch nicht implementiert
-      </div>
-    </PanelShell>
-  );
-}
+import { ComponentsPanel } from "./components-panel";
+import { ExportPanel } from "./export-panel";
+import { GeneratePanel } from "./generate-panel";
 
 export function renderPanel(section: SectionKey): React.ReactNode {
   switch (section) {
+    case "generate":
+      return <GeneratePanel />;
     case "colors":
       return <ColorsPanel />;
     case "typography":
@@ -32,8 +25,8 @@ export function renderPanel(section: SectionKey): React.ReactNode {
     case "effects":
       return <EffectsPanel />;
     case "components":
-      return <PlaceholderPanel title="Components" />;
+      return <ComponentsPanel />;
     case "export":
-      return <PlaceholderPanel title="Export" />;
+      return <ExportPanel />;
   }
 }

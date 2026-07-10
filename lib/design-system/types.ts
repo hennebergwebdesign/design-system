@@ -150,5 +150,5 @@ export interface Project {
 }
 
 export type SectionKey =
-  | "colors" | "typography" | "logo" | "spacing" | "effects"
+  | "generate" | "colors" | "typography" | "logo" | "spacing" | "effects"
   | "components" | "export";
