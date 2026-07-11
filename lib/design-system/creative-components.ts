@@ -18,25 +18,25 @@ import type {
 
 type R = (ctx: TemplateCtx) => string;
 
-// ── Mini-Helfer ───────────────────────────────────────────────
-const rep = (count: number, fn: (i: number) => string): string =>
+// ── Mini-Helfer (auch von inspired-components.ts genutzt) ──────
+export const rep = (count: number, fn: (i: number) => string): string =>
   Array.from({ length: Math.max(1, count) }, (_, i) => fn(i)).join("\n");
 
-const txt = (key: string, label: string, dflt: string): ComponentSlot => ({
+export const txt = (key: string, label: string, dflt: string): ComponentSlot => ({
   key,
   label,
   type: "text",
   default: dflt,
 });
 
-const num = (key: string, label: string, dflt: number): ComponentSlot => ({
+export const num = (key: string, label: string, dflt: number): ComponentSlot => ({
   key,
   label,
   type: "number",
   default: dflt,
 });
 
-function c(
+export function c(
   id: string,
   category: ConversionCategory,
   name: string,
@@ -49,11 +49,11 @@ function c(
 }
 
 /** Bild-/Medien-Platzhalter */
-const ph = (cls = "", label = ""): string =>
+export const ph = (cls = "", label = ""): string =>
   `<div class="ds-ph${cls ? ` ${cls}` : ""}">${label}</div>`;
 
 /** Duplizierter Marquee-Track (für nahtlose Endlos-Animation) */
-const marquee = (inner: string, rev = false): string =>
+export const marquee = (inner: string, rev = false): string =>
   `<div class="ds-marquee${rev ? " ds-marquee-rev" : ""}"><div class="ds-marquee-track"><span>${inner}</span><span aria-hidden="true">${inner}</span></div></div>`;
 
 const DEMO_WORDS = ["Design", "Strategie", "Branding", "Motion", "Web", "Identität"];

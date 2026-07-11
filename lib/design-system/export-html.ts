@@ -12,6 +12,7 @@ import {
 } from "./conversion-components";
 import { COMPONENT_BASE_CSS } from "./component-css";
 import { CREATIVE_CSS } from "./creative-components";
+import { INSPIRED_CSS } from "./inspired-components";
 
 export interface ExportOptions {
   selectedIds: string[];
@@ -943,6 +944,8 @@ body {
 ${COMPONENT_BASE_CSS}
 
 ${CREATIVE_CSS}
+
+${INSPIRED_CSS}
   </style>
 </head>
 <body>

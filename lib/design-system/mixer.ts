@@ -102,6 +102,42 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
     categories: ["hero", "about", "services", "social-proof", "social-proof", "trust", "contact"],
     styleId: "26-trust-authority",
   },
+  {
+    id: "fintech",
+    name: "Finance & Fintech",
+    description: "Aave/Mojek/Fruitful-inspiriert: App-Hero, Kennzahlen, Rate-Cards, Sicherheit.",
+    navIds: STRUCTURE_NAV_IDS,
+    footerIds: STRUCTURE_FOOTER_IDS,
+    categories: ["fintech", "fintech", "fintech", "social-proof", "fintech", "cta"],
+    styleId: "36-financial-dashboard",
+  },
+  {
+    id: "industrial",
+    name: "Industrial B2B",
+    description: "Terminal Industries/Azuro/Q-Industrial-inspiriert: Werks-Hero, Kapazitäten, Kennzahlen-Beweis.",
+    navIds: STRUCTURE_NAV_IDS,
+    footerIds: STRUCTURE_FOOTER_IDS,
+    categories: ["industrial-b2b", "industrial-b2b", "industrial-b2b", "industrial-b2b", "trust", "contact"],
+    styleId: "26-trust-authority",
+  },
+  {
+    id: "storytelling",
+    name: "Storytelling & Scroll",
+    description: "Bastion Cycles/PVG-inspiriert: gepinnter Scroll-Hero, Kapitel-Erzählung, Heritage.",
+    navIds: CREATIVE_NAV_IDS,
+    footerIds: CREATIVE_FOOTER_IDS,
+    categories: ["story-scroll", "story-scroll", "story-scroll", "gallery-creative", "story-scroll"],
+    styleId: "49-parallax-storytelling",
+  },
+  {
+    id: "technical",
+    name: "Technical & Spec",
+    description: "Ventrex-inspiriert: technischer Hero, Spec-Tabellen, Zertifizierungen, Systemdiagramm.",
+    navIds: STRUCTURE_NAV_IDS,
+    footerIds: STRUCTURE_FOOTER_IDS,
+    categories: ["technical-spec", "technical-spec", "technical-spec", "technical-spec", "cta"],
+    styleId: "50-swiss-modernism-2-0",
+  },
 ];
 
 export function getMixerTemplateStyle(template: MixerTemplate): KnowledgeStyle | undefined {

@@ -10,6 +10,7 @@ import {
 } from "@/lib/design-system/conversion-components";
 import { COMPONENT_BASE_CSS } from "@/lib/design-system/component-css";
 import { CREATIVE_CSS } from "@/lib/design-system/creative-components";
+import { INSPIRED_CSS } from "@/lib/design-system/inspired-components";
 
 export function ComponentsPreview({ system }: { system: DesignSystem }) {
   const { selectedIds, slotOverrides } = useComponentStore();
@@ -28,7 +29,7 @@ export function ComponentsPreview({ system }: { system: DesignSystem }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
       {/* Geteiltes Komponenten-CSS für selbst-rendernde Templates */}
-      <style>{COMPONENT_BASE_CSS + CREATIVE_CSS}</style>
+      <style>{COMPONENT_BASE_CSS + CREATIVE_CSS + INSPIRED_CSS}</style>
       {selectedIds.map((id, index) => {
         const comp = getComponentById(id);
         if (!comp) return null;
