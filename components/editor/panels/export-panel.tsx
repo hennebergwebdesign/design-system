@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, FileJson, Copy, Check } from "lucide-react";
+import { Download, FileJson, FileText, Copy, Check } from "lucide-react";
 import { PanelShell, PanelGroup } from "./panel-shell";
 import { useDesignSystem } from "@/lib/store/design-store";
 import { useActiveProject } from "@/lib/store/design-store";
@@ -10,6 +10,7 @@ import {
   generateExportHtml,
   generateDesignTokensJson,
 } from "@/lib/design-system/export-html";
+import { generateDesignGuidelinesMarkdown } from "@/lib/design-system/knowledge/export-guidelines";
 
 type ExportMode = "light" | "dark" | "both";
 
@@ -54,6 +55,7 @@ export function ExportPanel() {
   });
 
   const jsonOutput = generateDesignTokensJson(system);
+  const guidelinesOutput = generateDesignGuidelinesMarkdown(system, project.name);
 
   return (
     <PanelShell
@@ -134,6 +136,35 @@ export function ExportPanel() {
           >
             {copied === "json" ? <Check className="size-4 text-green-500" /> : <Copy className="size-4" />}
             {copied === "json" ? "Kopiert!" : "Kopieren"}
+          </button>
+        </div>
+      </PanelGroup>
+
+      <PanelGroup label="Design-Guidelines (Markdown)">
+        <p className="text-xs text-muted-foreground mb-3">
+          Accessibility-Kontrast-Check (live), UX-Regeln, Komponenten-Spezifikationen und
+          Marken-Checkliste als Referenzdokument fürs Team.
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={() =>
+              handleDownload(
+                guidelinesOutput,
+                `${project.name.toLowerCase().replace(/\s+/g, "-")}-guidelines.md`,
+                "text/markdown",
+              )
+            }
+            className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
+          >
+            <FileText className="size-4" />
+            Markdown herunterladen
+          </button>
+          <button
+            onClick={() => handleCopy(guidelinesOutput, "guidelines")}
+            className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+          >
+            {copied === "guidelines" ? <Check className="size-4 text-green-500" /> : <Copy className="size-4" />}
+            {copied === "guidelines" ? "Kopiert!" : "Kopieren"}
           </button>
         </div>
       </PanelGroup>

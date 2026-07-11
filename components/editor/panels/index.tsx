@@ -8,6 +8,7 @@ import { SpacingPanel } from "./spacing-panel";
 import { EffectsPanel } from "./effects-panel";
 import { ComponentsPanel } from "./components-panel";
 import { MixerPanel } from "./mixer-panel";
+import { LibraryPanel } from "./library-panel";
 import { ExportPanel } from "./export-panel";
 
 export function renderPanel(section: SectionKey): React.ReactNode {
@@ -26,6 +27,8 @@ export function renderPanel(section: SectionKey): React.ReactNode {
       return <ComponentsPanel />;
     case "mixer":
       return <MixerPanel />;
+    case "library":
+      return <LibraryPanel />;
     case "export":
       return <ExportPanel />;
   }
