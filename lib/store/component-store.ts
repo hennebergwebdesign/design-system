@@ -9,6 +9,7 @@ interface ComponentStore {
   addComponent: (id: string) => void;
   removeComponent: (id: string) => void;
   moveComponent: (from: number, to: number) => void;
+  setSelection: (selectedIds: string[]) => void;
   setSlotValue: (
     componentId: string,
     slotKey: string,
@@ -43,6 +44,8 @@ export const useComponentStore = create<ComponentStore>()(
           ids.splice(to, 0, item);
           return { selectedIds: ids };
         }),
+
+      setSelection: (selectedIds) => set({ selectedIds, slotOverrides: {} }),
 
       setSlotValue: (componentId, slotKey, value) =>
         set((s) => ({
