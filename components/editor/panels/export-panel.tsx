@@ -11,6 +11,11 @@ import {
   generateDesignTokensJson,
 } from "@/lib/design-system/export-html";
 import { generateDesignGuidelinesMarkdown } from "@/lib/design-system/knowledge/export-guidelines";
+import {
+  META_TITLE_MAX_CHARS,
+  META_DESCRIPTION_MAX_CHARS,
+} from "@/lib/design-system/knowledge/conversion-playbook";
+import { cn } from "@/lib/utils";
 
 type ExportMode = "light" | "dark" | "both";
 
@@ -20,6 +25,8 @@ export function ExportPanel() {
   const { selectedIds, slotOverrides } = useComponentStore();
   const [mode, setMode] = useState<ExportMode>("both");
   const [copied, setCopied] = useState<string | null>(null);
+  const [metaTitle, setMetaTitle] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
 
   if (!system || !project) {
     return (
@@ -52,6 +59,8 @@ export function ExportPanel() {
     projectName: project.name,
     mode,
     includeJsonLd: true,
+    metaTitle,
+    metaDescription,
   });
 
   const jsonOutput = generateDesignTokensJson(system);
@@ -77,6 +86,44 @@ export function ExportPanel() {
               {m === "light" ? "Light" : m === "dark" ? "Dark" : "Light + Dark"}
             </button>
           ))}
+        </div>
+      </PanelGroup>
+
+      <PanelGroup label="Meta-Titel & Beschreibung (SEO)">
+        <p className="mb-2 text-xs text-muted-foreground">
+          Fließt in <code>&lt;title&gt;</code> und <code>&lt;meta name=&quot;description&quot;&gt;</code> der exportierten
+          HTML-Datei ein. Formel laut Playbook: [Hauptkeyword] – [Benefit] | [Marke] bzw. [Problem] + [Benefits] + [CTA].
+        </p>
+        <div className="space-y-2">
+          <div>
+            <input
+              value={metaTitle}
+              onChange={(e) => setMetaTitle(e.target.value)}
+              placeholder="z. B. Physiotherapie Dachau – Rückenschmerzen weg in 6 Wochen"
+              className="w-full rounded-lg border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            <p className={cn(
+              "mt-1 text-[11px]",
+              metaTitle.length > META_TITLE_MAX_CHARS ? "text-destructive" : "text-muted-foreground",
+            )}>
+              {metaTitle.length} / {META_TITLE_MAX_CHARS} Zeichen
+            </p>
+          </div>
+          <div>
+            <textarea
+              value={metaDescription}
+              onChange={(e) => setMetaDescription(e.target.value)}
+              placeholder="z. B. Rückenschmerzen? Wir helfen ohne OP. Termin in 48h ✓ Kassenleistung ✓ Erfahrene Therapeuten → Jetzt Termin buchen"
+              rows={2}
+              className="w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            <p className={cn(
+              "mt-1 text-[11px]",
+              metaDescription.length > META_DESCRIPTION_MAX_CHARS ? "text-destructive" : "text-muted-foreground",
+            )}>
+              {metaDescription.length} / {META_DESCRIPTION_MAX_CHARS} Zeichen
+            </p>
+          </div>
         </div>
       </PanelGroup>
 

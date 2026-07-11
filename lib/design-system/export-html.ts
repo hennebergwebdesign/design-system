@@ -20,6 +20,10 @@ export interface ExportOptions {
   projectName: string;
   mode: "light" | "dark" | "both";
   includeJsonLd: boolean;
+  /** Meta-Titel nach der Playbook-Formel [Keyword] – [Benefit] | [Marke], max. 60 Zeichen. */
+  metaTitle?: string;
+  /** Meta-Beschreibung nach der Playbook-Formel [Problem] + [Benefits] + [CTA], max. 160 Zeichen. */
+  metaDescription?: string;
 }
 
 function cssVarsBlock(system: DesignSystem, mode: "light" | "dark"): string {
@@ -883,7 +887,7 @@ function esc(text: string): string {
 }
 
 export function generateExportHtml(options: ExportOptions): string {
-  const { selectedIds, slotOverrides, system, projectName, mode, includeJsonLd } = options;
+  const { selectedIds, slotOverrides, system, projectName, mode, includeJsonLd, metaTitle, metaDescription } = options;
   const { typography } = system;
 
   const lightVars = cssVarsBlock(system, "light");
@@ -915,7 +919,9 @@ export function generateExportHtml(options: ExportOptions): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${esc(projectName)} – Conversion-optimierte Seite</title>
+  <title>${esc(metaTitle?.trim() || `${projectName} – Conversion-optimierte Seite`)}</title>${
+    metaDescription?.trim() ? `\n  <meta name="description" content="${esc(metaDescription.trim())}">` : ""
+  }
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="${fontsHref}" rel="stylesheet">

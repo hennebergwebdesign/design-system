@@ -1,69 +1,60 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, Wand2, Check } from "lucide-react";
+import { Sparkles, Wand2, Check, Palette } from "lucide-react";
 import { PanelShell, PanelGroup } from "./panel-shell";
 import { Button } from "@/components/ui/button";
 import { useDesignStore } from "@/lib/store/design-store";
-import { usePagesStore } from "@/lib/store/pages-store";
+import { useComponentStore } from "@/lib/store/component-store";
 import { DESIGN_PRESETS, type DesignPreset } from "@/lib/design-system/presets";
-import { COMPONENT_VARIANTS } from "@/lib/design-system/components-library";
 import { computeTypeLevels } from "@/lib/design-system/derive";
+import {
+  MIXER_TEMPLATES,
+  mixPage,
+  getMixerTemplateStyle,
+  type MixerTemplate,
+} from "@/lib/design-system/mixer";
+import { styleToEffects } from "@/lib/design-system/knowledge/adapters";
 import { cn } from "@/lib/utils";
 
-const SITE_TEMPLATES: { id: string; name: string; description: string; pages: { name: string; sections: string[] }[] }[] = [
-  {
-    id: "landing",
-    name: "Landing Page",
-    description: "Einzelseite mit Hero, Features, Testimonials, CTA, Footer",
-    pages: [
-      { name: "Homepage", sections: ["navbar-1", "hero-1", "logos-1", "features-1", "testimonials-1", "cta-1", "footer-1"] },
-    ],
-  },
-  {
-    id: "saas",
-    name: "SaaS Website",
-    description: "Mehrseitige SaaS-Site mit Pricing und FAQ",
-    pages: [
-      { name: "Homepage", sections: ["navbar-1", "hero-2", "logos-1", "features-1", "stats-1", "testimonials-2", "cta-1", "footer-1"] },
-      { name: "Pricing", sections: ["navbar-1", "pricing-1", "faq-1", "cta-2", "footer-1"] },
-      { name: "About", sections: ["navbar-1", "hero-4", "team-1", "stats-2", "footer-1"] },
-    ],
-  },
-  {
-    id: "portfolio",
-    name: "Portfolio",
-    description: "Kreativ-Portfolio mit minimalem Layout",
-    pages: [
-      { name: "Homepage", sections: ["navbar-2", "hero-3", "features-4", "testimonials-2", "contact-1", "footer-2"] },
-    ],
-  },
-  {
-    id: "agency",
-    name: "Agentur-Website",
-    description: "Bold und energetisch für Kreativagenturen",
-    pages: [
-      { name: "Homepage", sections: ["navbar-1", "hero-1", "logos-1", "features-2", "stats-1", "testimonials-1", "cta-3", "footer-3"] },
-      { name: "Services", sections: ["navbar-1", "hero-4", "features-3", "pricing-2", "faq-2", "footer-3"] },
-      { name: "Contact", sections: ["navbar-1", "contact-2", "footer-2"] },
-    ],
-  },
-  {
-    id: "ecommerce",
-    name: "E-Commerce",
-    description: "Shop-Startseite mit Trust-Elementen",
-    pages: [
-      { name: "Homepage", sections: ["navbar-2", "hero-2", "logos-1", "features-4", "testimonials-3", "stats-1", "cta-1", "footer-1"] },
-      { name: "FAQ", sections: ["navbar-2", "faq-1", "contact-1", "footer-1"] },
-    ],
-  },
-];
+/**
+ * Wählt anhand von Stichworten im Prompt eine passende Vorlage aus dem
+ * Komponenten-Mixer. Nutzt denselben Katalog wie das Mixer-Panel, damit ein
+ * generierter Vorschlag sofort in Live-Vorschau, Components- und
+ * Export-Panel sichtbar ist (statt in einer separaten Sitemap-Struktur).
+ */
+function matchTemplate(query: string): MixerTemplate {
+  if (query.includes("saas") || query.includes("software") || query.includes("app"))
+    return MIXER_TEMPLATES.find((t) => t.id === "saas")!;
+  if (query.includes("portfolio") || query.includes("personal"))
+    return MIXER_TEMPLATES.find((t) => t.id === "portfolio")!;
+  if (query.includes("agentur") || query.includes("agency") || query.includes("kreativ"))
+    return MIXER_TEMPLATES.find((t) => t.id === "agency")!;
+  if (query.includes("shop") || query.includes("ecommerce") || query.includes("store"))
+    return MIXER_TEMPLATES.find((t) => t.id === "ecommerce")!;
+  if (query.includes("unternehmen") || query.includes("corporate") || query.includes("firma"))
+    return MIXER_TEMPLATES.find((t) => t.id === "corporate")!;
+  return MIXER_TEMPLATES.find((t) => t.id === "landing")!;
+}
+
+function matchPreset(query: string): DesignPreset {
+  for (const preset of DESIGN_PRESETS) {
+    if (preset.tags.some((t) => query.includes(t)) || query.includes(preset.name.toLowerCase())) {
+      return preset;
+    }
+  }
+  if (query.includes("luxu") || query.includes("premium") || query.includes("elegant")) return DESIGN_PRESETS[1];
+  if (query.includes("bold") || query.includes("kreativ") || query.includes("agentur")) return DESIGN_PRESETS[2];
+  if (query.includes("minimal") || query.includes("schlicht") || query.includes("portfolio")) return DESIGN_PRESETS[3];
+  if (query.includes("natur") || query.includes("organic") || query.includes("food") || query.includes("wellness"))
+    return DESIGN_PRESETS[4];
+  return DESIGN_PRESETS[0];
+}
 
 export function GeneratePanel() {
   const activeProjectId = useDesignStore((s) => s.activeProjectId);
   const update = useDesignStore((s) => s.update);
-  const addPage = usePagesStore((s) => s.addPage);
-  const addSection = usePagesStore((s) => s.addSection);
+  const setSelection = useComponentStore((s) => s.setSelection);
   const [promptText, setPromptText] = useState("");
   const [appliedPreset, setAppliedPreset] = useState<string | null>(null);
   const [appliedTemplate, setAppliedTemplate] = useState<string | null>(null);
@@ -96,13 +87,18 @@ export function GeneratePanel() {
     setTimeout(() => setAppliedPreset(null), 2000);
   }
 
-  function applyTemplate(template: typeof SITE_TEMPLATES[0]) {
-    for (const page of template.pages) {
-      const pageId = addPage(activeProjectId!, page.name);
-      for (const sectionId of page.sections) {
-        const variant = COMPONENT_VARIANTS.find((v) => v.id === sectionId);
-        if (variant) addSection(activeProjectId!, pageId, variant);
-      }
+  /** Mischt eine vollständige Seite über den Komponenten-Mixer und wendet dessen Stil an. */
+  function applyTemplate(template: MixerTemplate) {
+    const ids = mixPage(template);
+    setSelection(ids);
+    const style = getMixerTemplateStyle(template);
+    if (style) {
+      const effects = styleToEffects(style);
+      update((draft) => {
+        draft.effects.radius = effects.radius;
+        draft.effects.borderWidth = effects.borderWidth;
+        draft.effects.iconStyle = effects.iconStyle;
+      });
     }
     setAppliedTemplate(template.id);
     setTimeout(() => setAppliedTemplate(null), 2000);
@@ -111,36 +107,13 @@ export function GeneratePanel() {
   function handlePromptGenerate() {
     if (!promptText.trim()) return;
     const q = promptText.toLowerCase();
-    // Simple keyword matching to select a preset
-    let matched: DesignPreset | undefined;
-    for (const preset of DESIGN_PRESETS) {
-      if (preset.tags.some((t) => q.includes(t)) || q.includes(preset.name.toLowerCase())) {
-        matched = preset;
-        break;
-      }
-    }
-    if (!matched) {
-      // fallback: pick based on vibes
-      if (q.includes("luxu") || q.includes("premium") || q.includes("elegant")) matched = DESIGN_PRESETS[1];
-      else if (q.includes("bold") || q.includes("kreativ") || q.includes("agentur")) matched = DESIGN_PRESETS[2];
-      else if (q.includes("minimal") || q.includes("schlicht") || q.includes("portfolio")) matched = DESIGN_PRESETS[3];
-      else if (q.includes("natur") || q.includes("organic") || q.includes("food") || q.includes("wellness")) matched = DESIGN_PRESETS[4];
-      else matched = DESIGN_PRESETS[0];
-    }
-    applyPreset(matched);
-
-    // Also pick a matching template
-    let templateMatch = SITE_TEMPLATES[0];
-    if (q.includes("saas") || q.includes("software") || q.includes("app")) templateMatch = SITE_TEMPLATES[1];
-    else if (q.includes("portfolio") || q.includes("personal")) templateMatch = SITE_TEMPLATES[2];
-    else if (q.includes("agentur") || q.includes("agency") || q.includes("kreativ")) templateMatch = SITE_TEMPLATES[3];
-    else if (q.includes("shop") || q.includes("ecommerce") || q.includes("store")) templateMatch = SITE_TEMPLATES[4];
-    applyTemplate(templateMatch);
+    applyPreset(matchPreset(q));
+    applyTemplate(matchTemplate(q));
     setPromptText("");
   }
 
   return (
-    <PanelShell title="Generate" description="Beschreibe deine Marke – wir generieren Design & Sitemap.">
+    <PanelShell title="Generate" description="Beschreibe deine Marke – wir generieren Design & eine vollständige Seite aus dem Komponenten-Mixer.">
       <PanelGroup label="AI Prompt">
         <div className="space-y-2">
           <div className="relative">
@@ -154,8 +127,12 @@ export function GeneratePanel() {
           </div>
           <Button className="w-full" onClick={handlePromptGenerate} disabled={!promptText.trim()}>
             <Wand2 className="size-3.5" />
-            Design & Sitemap generieren
+            Design & Seite generieren
           </Button>
+          <p className="text-[11px] text-muted-foreground">
+            Wendet ein passendes Farb-/Typografie-Preset an und mischt direkt eine vollständige Seite
+            aus dem Conversion-Komponenten-Katalog (Mixer) inkl. passendem Stil.
+          </p>
         </div>
       </PanelGroup>
 
@@ -193,30 +170,35 @@ export function GeneratePanel() {
         </div>
       </PanelGroup>
 
-      <PanelGroup label="Sitemap Templates">
+      <PanelGroup label="Seiten-Vorlagen (Mixer)">
         <div className="space-y-2">
-          {SITE_TEMPLATES.map((tmpl) => (
-            <button
-              key={tmpl.id}
-              onClick={() => applyTemplate(tmpl)}
-              className={cn(
-                "flex w-full items-start gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50",
-                appliedTemplate === tmpl.id && "border-green-500 bg-green-50 dark:bg-green-950/20",
-              )}
-            >
-              <Sparkles className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <p className="text-xs font-medium">{tmpl.name}</p>
-                  {appliedTemplate === tmpl.id && <Check className="size-3 text-green-600" />}
+          {MIXER_TEMPLATES.map((tmpl) => {
+            const style = getMixerTemplateStyle(tmpl);
+            return (
+              <button
+                key={tmpl.id}
+                onClick={() => applyTemplate(tmpl)}
+                className={cn(
+                  "flex w-full items-start gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50",
+                  appliedTemplate === tmpl.id && "border-green-500 bg-green-50 dark:bg-green-950/20",
+                )}
+              >
+                <Sparkles className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs font-medium">{tmpl.name}</p>
+                    {appliedTemplate === tmpl.id && <Check className="size-3 text-green-600" />}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">{tmpl.description}</p>
+                  {style && (
+                    <p className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground/70">
+                      <Palette className="size-2.5" /> Stil: {style.name}
+                    </p>
+                  )}
                 </div>
-                <p className="text-[11px] text-muted-foreground">{tmpl.description}</p>
-                <p className="mt-0.5 text-[10px] text-muted-foreground/70">
-                  {tmpl.pages.length} {tmpl.pages.length === 1 ? "Seite" : "Seiten"} · {tmpl.pages.reduce((a, p) => a + p.sections.length, 0)} Sektionen
-                </p>
-              </div>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
       </PanelGroup>
     </PanelShell>

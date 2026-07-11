@@ -1,6 +1,7 @@
 "use client";
 
 import type { SectionKey } from "@/lib/design-system/types";
+import { GeneratePanel } from "./generate-panel";
 import { ColorsPanel } from "./colors-panel";
 import { TypographyPanel } from "./typography-panel";
 import { LogoPanel } from "./logo-panel";
@@ -13,6 +14,8 @@ import { ExportPanel } from "./export-panel";
 
 export function renderPanel(section: SectionKey): React.ReactNode {
   switch (section) {
+    case "generate":
+      return <GeneratePanel />;
     case "colors":
       return <ColorsPanel />;
     case "typography":
