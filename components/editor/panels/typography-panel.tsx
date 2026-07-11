@@ -7,6 +7,7 @@ import type { TypeLevelKey } from "@/lib/design-system/types";
 import { TYPE_LEVEL_KEYS } from "@/lib/design-system/types";
 import {
   FONT_PAIRINGS,
+  PAIRING_VIBES,
   SCALE_PRESETS,
   applyScale,
   findFont,
@@ -55,31 +56,57 @@ export function TypographyPanel() {
       title="Typography"
       description="Schriften wählen und die Type-Scale definieren."
     >
-      <PanelGroup label="Font-Pairing-Vorschläge">
-        <div className="grid grid-cols-2 gap-2">
-          {FONT_PAIRINGS.map((pairing) => (
-            <button
-              key={pairing.name}
-              type="button"
-              onClick={() => {
-                loadGoogleFont(pairing.heading);
-                loadGoogleFont(pairing.body);
-                update((draft) => {
-                  draft.typography.heading = findFont(pairing.heading);
-                  draft.typography.body = findFont(pairing.body);
-                });
-              }}
-              className={cn(
-                "rounded-lg border p-2.5 text-left transition-colors hover:bg-muted/50",
-                currentPairing?.name === pairing.name && "border-primary bg-primary/5",
-              )}
-            >
-              <p className="text-xs font-semibold">{pairing.name}</p>
-              <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
-                {pairing.heading} + {pairing.body}
-              </p>
-            </button>
-          ))}
+      <PanelGroup label={`Font-Pairing-Vorschläge (${FONT_PAIRINGS.length})`}>
+        <div className="space-y-3">
+          {PAIRING_VIBES.map((vibe) => {
+            const pairings = FONT_PAIRINGS.filter((p) => p.vibe === vibe);
+            if (pairings.length === 0) return null;
+            return (
+              <details
+                key={vibe}
+                className="group rounded-lg border"
+                open={pairings.some((p) => p.name === currentPairing?.name)}
+              >
+                <summary className="cursor-pointer select-none px-3 py-2 text-xs font-semibold">
+                  {vibe}
+                  <span className="ml-1.5 font-normal text-muted-foreground">
+                    {pairings.length}
+                  </span>
+                </summary>
+                <div className="grid grid-cols-2 gap-2 p-2 pt-0">
+                  {pairings.map((pairing) => (
+                    <button
+                      key={pairing.name}
+                      type="button"
+                      onClick={() => {
+                        loadGoogleFont(pairing.heading);
+                        loadGoogleFont(pairing.body);
+                        update((draft) => {
+                          draft.typography.heading = {
+                            family: pairing.heading,
+                            category: findFont(pairing.heading).category,
+                          };
+                          draft.typography.body = {
+                            family: pairing.body,
+                            category: findFont(pairing.body).category,
+                          };
+                        });
+                      }}
+                      className={cn(
+                        "rounded-lg border p-2.5 text-left transition-colors hover:bg-muted/50",
+                        currentPairing?.name === pairing.name && "border-primary bg-primary/5",
+                      )}
+                    >
+                      <p className="text-xs font-semibold">{pairing.name}</p>
+                      <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
+                        {pairing.heading} + {pairing.body}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </details>
+            );
+          })}
         </div>
       </PanelGroup>
 

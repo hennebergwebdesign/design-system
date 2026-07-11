@@ -2,6 +2,8 @@
 // Jede Komponente definiert Kategorie, konfigurierbaren Inhalt und
 // HTML-Template-Funktion, die mit Design-System-Tokens arbeitet.
 
+import { CREATIVE_COMPONENTS } from "./creative-components";
+
 export type ConversionCategory =
   | "structure"
   | "hero"
@@ -16,7 +18,22 @@ export type ConversionCategory =
   | "content"
   | "contact"
   | "recovery"
-  | "trust";
+  | "trust"
+  // Kreativ-Kategorien (inspiriert von Awwwards, Dribbble, Land-book, Recent.design)
+  | "hero-creative"
+  | "typography-art"
+  | "bento"
+  | "cards-creative"
+  | "gallery-creative"
+  | "scroll-motion"
+  | "nav-creative"
+  | "footer-creative"
+  | "commerce"
+  | "editorial"
+  | "showcase"
+  | "social-creative"
+  | "decor"
+  | "interactive-creative";
 
 export const CATEGORY_META: Record<
   ConversionCategory,
@@ -78,16 +95,84 @@ export const CATEGORY_META: Record<
     label: "Trust-Signale",
     description: "Sicherheitssiegel, Garantien, Zertifizierungen",
   },
+  "hero-creative": {
+    label: "Kreative Heroes",
+    description: "Oversized-Typo, Split-Layouts, Gradients – Awwwards-inspiriert",
+  },
+  "typography-art": {
+    label: "Typo & Text-Art",
+    description: "Riesige Outline-Headlines, Marquees, kinetische Textzeilen",
+  },
+  bento: {
+    label: "Bento-Grids",
+    description: "Modulare Kachel-Layouts im Bento-Stil",
+  },
+  "cards-creative": {
+    label: "Kreative Cards",
+    description: "Glassmorphism, Brutalismus, Hover-Effekte, Polaroids",
+  },
+  "gallery-creative": {
+    label: "Galerien & Showcase",
+    description: "Horizontal-Scroll, Collagen, Filmstreifen, Hover-Reveals",
+  },
+  "scroll-motion": {
+    label: "Scroll & Motion",
+    description: "Parallax-Ebenen, Reveal-Kaskaden, Sticky-Panels",
+  },
+  "nav-creative": {
+    label: "Kreative Navigation",
+    description: "Mega-Menüs, Pill-Navs, Fullscreen-Overlays, Docks",
+  },
+  "footer-creative": {
+    label: "Kreative Footer",
+    description: "Oversized-Brand-Footer, Mega-Footer, Marquee-Footer",
+  },
+  commerce: {
+    label: "E-Commerce",
+    description: "Produkt-Grids, Lookbooks, Kollektionen, Warenkorb-Elemente",
+  },
+  editorial: {
+    label: "Editorial & Blog",
+    description: "Magazin-Grids, Featured Articles, Autoren, Leselisten",
+  },
+  showcase: {
+    label: "App & SaaS Showcase",
+    description: "Device-Mockups, Dashboards, Integrationen, Changelogs",
+  },
+  "social-creative": {
+    label: "Social & Community",
+    description: "Insta-Grids, Tweet-Walls, Avatar-Clouds, Community-Stats",
+  },
+  decor: {
+    label: "Deko & Divider",
+    description: "Wellen, Diagonalen, Gradient-Orbs, Badge-Bänder",
+  },
+  "interactive-creative": {
+    label: "Interaktive Blöcke",
+    description: "Akkordeon-Showcases, Tabs, Hover-Grids, Toggles",
+  },
 };
 
 export const CATEGORIES_ORDERED: ConversionCategory[] = [
   "structure",
+  "nav-creative",
   "hero",
+  "hero-creative",
+  "typography-art",
+  "bento",
   "about",
   "services",
+  "showcase",
+  "commerce",
   "social-proof",
+  "social-creative",
   "media",
+  "gallery-creative",
+  "cards-creative",
+  "editorial",
   "content",
+  "scroll-motion",
+  "interactive-creative",
   "pricing",
   "engagement",
   "urgency",
@@ -95,7 +180,21 @@ export const CATEGORIES_ORDERED: ConversionCategory[] = [
   "contact",
   "trust",
   "recovery",
+  "decor",
+  "footer-creative",
 ];
+
+/** Kontext, den selbst-rendernde Komponenten in ihrem Template erhalten. */
+export interface TemplateCtx {
+  /** Slot-Wert, bereits HTML-escaped */
+  s: (key: string) => string;
+  /** Numerischer Slot-Wert */
+  n: (key: string) => number;
+  /** Öffnendes <section>-Tag, optional mit Zusatzklassen (z. B. Skins) */
+  open: (extraClass?: string) => string;
+  /** Schließendes </section>-Tag */
+  close: string;
+}
 
 export interface ConversionComponentDef {
   id: string;
@@ -104,6 +203,12 @@ export interface ConversionComponentDef {
   description: string;
   conversionTip: string;
   slots: ComponentSlot[];
+  /**
+   * Selbst-rendernde Komponenten liefern ihr HTML hier – genutzt vom
+   * HTML-Export und der Live-Preview. Komponenten ohne render werden
+   * über die klassischen Switch-Templates gerendert.
+   */
+  render?: (ctx: TemplateCtx) => string;
 }
 
 export interface ComponentSlot {
@@ -114,7 +219,7 @@ export interface ComponentSlot {
   placeholder?: string;
 }
 
-export const CONVERSION_COMPONENTS: ConversionComponentDef[] = [
+const BASE_COMPONENTS: ConversionComponentDef[] = [
   // ── Hero & Above-the-Fold ──────────────────────────────────
   {
     id: "hero-proof",
@@ -808,6 +913,45 @@ export const CONVERSION_COMPONENTS: ConversionComponentDef[] = [
     ],
   },
 ];
+
+export const CONVERSION_COMPONENTS: ConversionComponentDef[] = [
+  ...BASE_COMPONENTS,
+  ...CREATIVE_COMPONENTS,
+];
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/**
+ * Rendert eine selbst-rendernde Komponente (comp.render) mit aufgelösten
+ * Slot-Werten. Gibt null zurück, wenn die Komponente kein Template besitzt.
+ * Wird vom HTML-Export und der Live-Preview gemeinsam genutzt.
+ */
+export function renderTemplate(
+  comp: ConversionComponentDef,
+  overrides: Record<string, string | number | boolean>,
+): string | null {
+  if (!comp.render) return null;
+  const raw = (key: string): string | number | boolean => {
+    const override = overrides[key];
+    if (override !== undefined) return override;
+    const def = comp.slots.find((slot) => slot.key === key);
+    return def ? def.default : "";
+  };
+  const ctx: TemplateCtx = {
+    s: (key) => escapeHtml(String(raw(key))),
+    n: (key) => Number(raw(key)) || 0,
+    open: (extraClass) =>
+      `<section class="ds-section ds-reveal${extraClass ? ` ${extraClass}` : ""}" id="sec-${comp.id}" data-component="${comp.id}" data-category="${comp.category}">`,
+    close: "</section>",
+  };
+  return comp.render(ctx);
+}
 
 export function getComponentsByCategory(
   category: ConversionCategory,

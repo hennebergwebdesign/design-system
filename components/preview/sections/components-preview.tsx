@@ -5,8 +5,11 @@ import type { DesignSystem } from "@/lib/design-system/types";
 import { useComponentStore } from "@/lib/store/component-store";
 import {
   getComponentById,
+  renderTemplate,
   type ConversionComponentDef,
 } from "@/lib/design-system/conversion-components";
+import { COMPONENT_BASE_CSS } from "@/lib/design-system/component-css";
+import { CREATIVE_CSS } from "@/lib/design-system/creative-components";
 
 export function ComponentsPreview({ system }: { system: DesignSystem }) {
   const { selectedIds, slotOverrides } = useComponentStore();
@@ -24,6 +27,8 @@ export function ComponentsPreview({ system }: { system: DesignSystem }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+      {/* Geteiltes Komponenten-CSS für selbst-rendernde Templates */}
+      <style>{COMPONENT_BASE_CSS + CREATIVE_CSS}</style>
       {selectedIds.map((id, index) => {
         const comp = getComponentById(id);
         if (!comp) return null;
@@ -175,12 +180,18 @@ function ComponentRenderer({
       return <TrustBadges s={s} n={n} />;
     case "guarantee-section":
       return <GuaranteeSection s={s} />;
-    default:
+    default: {
+      const html = renderTemplate(comp, overrides);
+      if (html !== null) {
+        // Selbst-renderndes Template: identisches HTML wie im Export.
+        return <div dangerouslySetInnerHTML={{ __html: html }} />;
+      }
       return (
         <div style={{ ...section, textAlign: "center", color: "var(--ds-text-muted)" }}>
           Vorschau für „{comp.name}“ folgt.
         </div>
       );
+    }
   }
 }
 
