@@ -93,6 +93,7 @@ function PreviewContent({
       return <EffectsPreview system={system} />;
     case "components":
     case "mixer":
+    case "generate":
       return <ComponentsPreview system={system} />;
     default:
       return (
