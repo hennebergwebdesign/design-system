@@ -270,6 +270,24 @@ export const GOOGLE_FONTS: GoogleFont[] = [
   { family: "Patrick Hand", category: "cursive", weights: [400] },
   { family: "Reenie Beanie", category: "cursive", weights: [400] },
   { family: "Zeyada", category: "cursive", weights: [400] },
+
+  // ── Elegante Signature-Scripts (freie Alternativen zu Premium-
+  //    Fonts wie „Amsterdam Four" oder „Brittany Signature") ────
+  { family: "Alex Brush", category: "cursive", weights: [400] },
+  { family: "Mrs Saint Delafield", category: "cursive", weights: [400] },
+  { family: "Herr Von Muellerhoff", category: "cursive", weights: [400] },
+  { family: "Beau Rivage", category: "cursive", weights: [400] },
+  { family: "Meddon", category: "cursive", weights: [400] },
+  { family: "WindSong", category: "cursive", weights: [400, 500] },
+  { family: "Rouge Script", category: "cursive", weights: [400] },
+  { family: "Marck Script", category: "cursive", weights: [400] },
+  { family: "Style Script", category: "cursive", weights: [400] },
+  { family: "Petit Formal Script", category: "cursive", weights: [400] },
+  { family: "Italianno", category: "cursive", weights: [400] },
+  { family: "Pinyon Script", category: "cursive", weights: [400] },
+  { family: "Monsieur La Doulaise", category: "cursive", weights: [400] },
+  { family: "Charm", category: "cursive", weights: [400, 700] },
+  { family: "Ephesis", category: "cursive", weights: [400] },
 ];
 
 export function findFont(family: string): GoogleFont {
@@ -458,6 +476,11 @@ export const FONT_PAIRINGS: FontPairing[] = [
   { name: "Café-Tafel", heading: "Amatic SC", body: "Josefin Sans", vibe: "Handschrift & Persönlich" },
   { name: "Brief an dich", heading: "Satisfy", body: "Mulish", vibe: "Handschrift & Persönlich" },
   { name: "Kreide & Papier", heading: "Kalam", body: "Karla", vibe: "Handschrift & Persönlich" },
+  { name: "Signatur & Bricolage", heading: "Mrs Saint Delafield", body: "Bricolage Grotesque", vibe: "Handschrift & Persönlich" },
+  { name: "Unterschrift", heading: "Alex Brush", body: "Bricolage Grotesque", vibe: "Handschrift & Persönlich" },
+  { name: "Eleganter Schwung", heading: "Herr Von Muellerhoff", body: "Work Sans", vibe: "Handschrift & Persönlich" },
+  { name: "Boutique-Logo", heading: "WindSong", body: "Nunito Sans", vibe: "Handschrift & Persönlich" },
+  { name: "Feine Feder", heading: "Pinyon Script", body: "Lora", vibe: "Handschrift & Persönlich" },
 
   // ── Warm & Organisch ────────────────────────────────────────
   { name: "Naturkosmetik", heading: "Fraunces", body: "Nunito Sans", vibe: "Warm & Organisch" },
