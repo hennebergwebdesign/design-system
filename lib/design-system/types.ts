@@ -151,4 +151,4 @@ export interface Project {
 
 export type SectionKey =
   | "generate" | "colors" | "typography" | "logo" | "spacing" | "effects"
-  | "components" | "mixer" | "export";
+  | "components" | "mixer" | "library" | "export";

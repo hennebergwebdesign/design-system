@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BookMarked,
   Download,
   Grid3x3,
   ImageIcon,
@@ -24,6 +25,7 @@ const SECTIONS: { key: SectionKey; label: string; icon: LucideIcon; separator?: 
   { key: "effects", label: "Effects", icon: Sparkles },
   { key: "components", label: "Components", icon: LayoutTemplate, separator: true },
   { key: "mixer", label: "Mixer", icon: Shuffle },
+  { key: "library", label: "Library", icon: BookMarked },
   { key: "export", label: "Export", icon: Download },
 ];
 
