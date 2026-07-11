@@ -82,3 +82,22 @@ Design-Patterns; die Awwwards-Startseite wurde live ausgewertet.
 | Komponenten-Kategorien | 14 | 28 |
 | Google Fonts | 103 | **246** |
 | Font-Pairing-Gruppen | 14 | **135** |
+
+## Nachtrag: Site-Inspirationen (Juli 2026)
+
+Vier weitere Kategorien (27 Sektionen), direkt abgeleitet aus konkret
+benannten Referenz-Websites statt aus Galerie-Trends. Live-Analyse per
+Fetch, Umsetzung in `lib/design-system/inspired-components.ts`
+(gleiches `render(ctx)`-Muster wie `creative-components.ts`, eigenes
+`INSPIRED_CSS` mit den Präfixen `ds-fn-`, `ds-in-`, `ds-sc-`, `ds-tc-`).
+
+| Kategorie | Quellen | Sektionen |
+| --- | --- | --- |
+| `fintech` – Finance & Fintech | aave.com, mojek.money, fruitful.com | 7 |
+| `industrial-b2b` – Industrial & B2B | anthem.co.za, azurodigital.com/manufacturing-web-design, webyansh.com/webflow-agency/migrate-to-webflow, terminal-industries.com, flexis-mobility.com, markwoodland.com.au, q-industrial.com | 7 |
+| `story-scroll` – Storytelling & Scroll-Hero | bastioncycles.com, pvg.co | 6 |
+| `technical-spec` – Technical & Spec | ventrex.com/en/hydrogen | 7 |
+
+Jede Kategorie ist zusätzlich als eigene Vorlage im Komponenten-Mixer
+verfügbar (`lib/design-system/mixer.ts`: `fintech`, `industrial`,
+`storytelling`, `technical`).

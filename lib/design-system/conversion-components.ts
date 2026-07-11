@@ -3,6 +3,7 @@
 // HTML-Template-Funktion, die mit Design-System-Tokens arbeitet.
 
 import { CREATIVE_COMPONENTS } from "./creative-components";
+import { INSPIRED_COMPONENTS } from "./inspired-components";
 
 export type ConversionCategory =
   | "structure"
@@ -33,7 +34,12 @@ export type ConversionCategory =
   | "showcase"
   | "social-creative"
   | "decor"
-  | "interactive-creative";
+  | "interactive-creative"
+  // Site-Inspirationen (Fintech/SaaS, Industrial-B2B, Storytelling, Technical)
+  | "fintech"
+  | "industrial-b2b"
+  | "story-scroll"
+  | "technical-spec";
 
 export const CATEGORY_META: Record<
   ConversionCategory,
@@ -151,6 +157,22 @@ export const CATEGORY_META: Record<
     label: "Interaktive Blöcke",
     description: "Akkordeon-Showcases, Tabs, Hover-Grids, Toggles",
   },
+  fintech: {
+    label: "Finance & Fintech",
+    description: "Aave/Mojek/Fruitful-inspiriert: Rate-Cards, Stats, App-Mockups, Trust-Leisten",
+  },
+  "industrial-b2b": {
+    label: "Industrial & B2B",
+    description: "Anthem/Azuro/Terminal Industries/Q-Industrial-inspiriert: Werks-Heroes, Kennzahlen, Kapazitäten",
+  },
+  "story-scroll": {
+    label: "Storytelling & Scroll-Hero",
+    description: "Bastion Cycles/PVG-inspiriert: gepinnte Scroll-Heroes, Kapitel-Erzählung, Heritage",
+  },
+  "technical-spec": {
+    label: "Technical & Spec",
+    description: "Ventrex-inspiriert: Schema-Diagramme, Spec-Tabellen, technische Zertifizierungsbänder",
+  },
 };
 
 export const CATEGORIES_ORDERED: ConversionCategory[] = [
@@ -160,6 +182,10 @@ export const CATEGORIES_ORDERED: ConversionCategory[] = [
   "hero-creative",
   "typography-art",
   "bento",
+  "fintech",
+  "industrial-b2b",
+  "story-scroll",
+  "technical-spec",
   "about",
   "services",
   "showcase",
@@ -917,6 +943,7 @@ const BASE_COMPONENTS: ConversionComponentDef[] = [
 export const CONVERSION_COMPONENTS: ConversionComponentDef[] = [
   ...BASE_COMPONENTS,
   ...CREATIVE_COMPONENTS,
+  ...INSPIRED_COMPONENTS,
 ];
 
 function escapeHtml(text: string): string {
