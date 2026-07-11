@@ -6,6 +6,7 @@ import {
   ImageIcon,
   LayoutTemplate,
   Palette,
+  Shuffle,
   Sparkles,
   Type,
   Wand2,
@@ -22,6 +23,7 @@ const SECTIONS: { key: SectionKey; label: string; icon: LucideIcon; separator?: 
   { key: "spacing", label: "Spacing", icon: Grid3x3 },
   { key: "effects", label: "Effects", icon: Sparkles },
   { key: "components", label: "Components", icon: LayoutTemplate, separator: true },
+  { key: "mixer", label: "Mixer", icon: Shuffle },
   { key: "export", label: "Export", icon: Download },
 ];
 
