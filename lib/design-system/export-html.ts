@@ -10,7 +10,7 @@ import {
   renderTemplate,
   type ConversionComponentDef,
 } from "./conversion-components";
-import { assignRhythmForIds, skinClass } from "./mixer";
+import { assignRhythmForIds, reorderIdsByFrame, skinClass } from "./mixer";
 import { COMPONENT_BASE_CSS } from "./component-css";
 import { CREATIVE_CSS } from "./creative-components";
 import { INSPIRED_CSS } from "./inspired-components";
@@ -902,8 +902,9 @@ export function generateExportHtml(options: ExportOptions): string {
     cssVarsSection = `:root {\n${mode === "light" ? lightVars : darkVars}\n}`;
   }
 
-  const rhythm = assignRhythmForIds(selectedIds);
-  const componentsHtml = selectedIds
+  const orderedIds = reorderIdsByFrame(selectedIds);
+  const rhythm = assignRhythmForIds(orderedIds);
+  const componentsHtml = orderedIds
     .map((id, i) => {
       const comp = CONVERSION_COMPONENTS.find((c) => c.id === id);
       if (!comp) return "";

@@ -40,6 +40,12 @@ export interface PageArchitecture {
   rules: string[];
 }
 
+// Verbindliche Section-Reihenfolge jeder Startseite:
+// Hero → Trust (Kennzahlen) → (Zielgruppenansprache) → Leistungen/Angebote
+// → Ablauf (mit CTA) → About (Warum wir) → (Case Studies / Trust) → (Blog)
+// → FAQ → Contact / Final-CTA. FAQ steht IMMER unmittelbar vor Contact/
+// Final-CTA. Blog erscheint entweder oberhalb der FAQ oder gar nicht.
+
 export const PAGE_ARCHITECTURES: PageArchitecture[] = [
   {
     id: "dual-pillar-homepage",
@@ -59,76 +65,95 @@ export const PAGE_ARCHITECTURES: PageArchitecture[] = [
       },
       {
         slotId: "trust-strip",
-        title: "Kennzahlenleiste",
+        title: "Trust / Kennzahlenleiste",
         purpose:
           "3–4 harte Zahlen direkt unter dem Hero — beweisen Erfahrung und Ergebnisse, bevor der Besucher weiterscrollt.",
         copyHint:
           "Große Zahl + kurze Beschreibung. Beispiele: 100+ Klient:innen · 98 % Bewilligungsquote · 14+ Jahre Erfahrung · 4,9/5,0 Google.",
       },
       {
+        slotId: "audience",
+        title: "Zielgruppenansprache (optional)",
+        purpose:
+          "'Für dich, wenn du …' — spricht beide Säulen-Zielgruppen direkt an und lässt Besucher sich wiedererkennen.",
+        copyHint:
+          "H2 + Bullet-Liste 'Für dich, wenn du …' mit je 3–4 Punkten pro Säule, optional als Zwei-Spalten-Layout.",
+      },
+      {
         slotId: "value-props",
-        title: "Zwei-Säulen-Überblick",
+        title: "Leistungen / Zwei-Säulen-Überblick",
         purpose:
           "Zwei gleichwertige Kacheln nebeneinander (Desktop) bzw. untereinander (Mobil), damit der Besucher sofort weiß, welche Säule zu ihm passt.",
         copyHint:
           "Pro Kachel: Icon, H2, 2–3 Sätze Nutzenversprechen, CTA-Link zur jeweiligen Leistungs-Unterseite.",
       },
       {
-        slotId: "trust",
-        title: "Fördermechanik / AVGS-Info-Block",
+        slotId: "process",
+        title: "Ablauf / Prozess in 4 Schritten (mit CTA)",
         purpose:
-          "Vertrauen und Aufklärung: erklärt den geteilten Fördermechanismus (z. B. AVGS) und nimmt die Kostenfrage aus dem Spiel.",
+          "Reduziert wahrgenommene Komplexität und senkt die Einstiegshürde zum Erstgespräch. Enthält den Prozess-CTA.",
         copyHint:
-          "H2, kurzer Erklärtext, 3–4 Vorteile als Icon-Liste, primärer CTA zum Anspruchs-/Eignungs-Check.",
+          "H2 + 4 nummerierte Schritte (Anspruch prüfen → Erstgespräch → Coaching/Umsetzung → Ergebnis) + primärer CTA am Ende.",
       },
       {
         slotId: "about",
-        title: "Doppelspitze / Team-Kurzvorstellung",
+        title: "About / Warum wir",
         purpose:
-          "Beide Ansprechpersonen werden gleichwertig vorgestellt — signalisiert persönliche Betreuung statt Callcenter.",
+          "Doppelspitze und Werte — beide Ansprechpersonen gleichwertig vorgestellt, signalisiert persönliche Betreuung statt Callcenter. Fördermechanik (z. B. AVGS) kann hier oder als eigener Trust-Block darüber laufen.",
         copyHint:
           "H2 + zwei Personen-Karten (Foto, Rolle, 2–3 Sätze Werdegang, Spezialisierungs-Tags), Link zu Über-uns.",
       },
       {
-        slotId: "problem",
-        title: "So funktioniert's / Prozess in 4 Schritten",
-        purpose:
-          "Reduziert wahrgenommene Komplexität und senkt die Einstiegshürde zum Erstgespräch.",
-        copyHint:
-          "H2 + 4 nummerierte Schritte (Anspruch prüfen → Erstgespräch → Coaching/Umsetzung → Ergebnis), CTA zum Anspruchs-Check.",
-      },
-      {
         slotId: "social-proof",
-        title: "Referenzen / Testimonials mit Säulen-Labels",
+        title: "Case Studies / Testimonials (mit Säulen-Labels)",
         purpose:
           "Erfolgsgeschichten aus beiden Säulen — jedes Testimonial ist mit einem Label (Säule 1 / Säule 2) versehen, damit Besucher sich wiederfinden.",
         copyHint:
           "H2 + 4–6 Testimonial-Karten mit Zitat, Name, Rolle und Säulen-Label.",
       },
       {
+        slotId: "blog",
+        title: "Blog / Ressourcen (optional, über der FAQ oder gar nicht)",
+        purpose:
+          "Content-Autorität und interne Verlinkung. Nur einbauen, wenn regelmäßig Artikel erscheinen — sonst weglassen.",
+        copyHint:
+          "H2 + 3 aktuelle Artikel-Karten (Bild, Kategorie, Titel, Anrisstext). Immer oberhalb der FAQ.",
+      },
+      {
         slotId: "objection",
-        title: "FAQ-Kurzversion (6–8 Fragen)",
+        title: "FAQ (immer direkt vor Contact/Final-CTA)",
         purpose:
           "Fängt die häufigsten Einwände ab (Kosten, Voraussetzungen, Prozess) — Akkordeon-Format, verlinkt auf die vollständige FAQ-Seite.",
         copyHint:
           "H2 + 6–8 Fragen als Akkordeon, Link am Ende zur vollständigen FAQ-Seite.",
       },
       {
-        slotId: "final-cta",
-        title: "Abschluss-CTA",
+        slotId: "contact",
+        title: "Contact / Formular",
         purpose:
-          "Letzter Conversion-Punkt vor dem Footer — bündelt beide Säulen in einer Aktion (z. B. gemeinsamer Anspruchs-Check).",
+          "Der eigentliche Conversion-Punkt: Anspruchs-Check oder Kontaktformular mit maximal 4–5 Feldern.",
+        copyHint:
+          "H2 + Kurztext + Formular (Vorname, E-Mail, Telefon, optional Freitext) + Datenschutz-Hinweis.",
+      },
+      {
+        slotId: "final-cta",
+        title: "Final-CTA (Fallback / Panel unter dem Formular)",
+        purpose:
+          "Letzter Aufruf für Besucher, die das Formular übersprungen haben — Telefon-Fallback und Micro-Copy.",
         copyHint:
           "H2, kurzer Nutzensatz, primärer CTA. Micro-Copy: 'Kein Abo · Keine versteckten Kosten · 100 % förderbar'.",
       },
     ],
     rules: [
+      "Reihenfolge ist verbindlich: Hero → Trust → (Audience) → Leistungen → Ablauf → About → (Case Studies) → (Blog) → FAQ → Contact/Final-CTA. Der Mixer erzwingt sie über CONVERSION_FRAME.",
+      "FAQ steht IMMER direkt vor Contact/Final-CTA. Kein Trust-, Blog- oder Content-Block darf dazwischen liegen.",
+      "Blog erscheint entweder oberhalb der FAQ oder gar nicht — nie darunter, nie zwischen Ablauf und About.",
       "Beide Säulen bleiben in Hero, Kacheln, Team und Testimonials gleichwertig sichtbar — keine Säule wird dominant.",
-      "Der Anspruchs-/Eignungs-Check ist der geteilte primäre CTA — er erscheint mindestens in Hero, Trust-Block, Prozess, FAQ und Abschluss.",
+      "Der Anspruchs-/Eignungs-Check ist der geteilte primäre CTA — er erscheint mindestens in Hero, Ablauf und Final-CTA.",
       "Mobil werden die Zwei-Säulen-Kacheln gestapelt (nicht nebeneinander), damit jede Säule denselben Above-the-Fold-Raum bekommt.",
       "Navigation auf Mobil als Off-Canvas-Menü — hält Hero + Doppel-CTA sauber und zeigt den primären CTA prominent im geöffneten Panel.",
-      "Sektionen wechseln immer sichtbar den Hintergrund (bg ↔ surface, mit Tint-Akzent auf AVGS-Block und Final-CTA) — der Mixer weist das Skin automatisch zu.",
-      "Padding pro Sektion: Hero und Final-CTA großzügig (lg), Kennzahlenleiste kompakt (sm), alle übrigen Sektionen standardmäßig (md) — via clamp() aus den Spacing-Tokens abgeleitet.",
+      "Sektionen wechseln immer sichtbar den Hintergrund (bg ↔ surface, mit Tint-Akzent auf Trust-Streifen und Final-CTA) — der Mixer weist das Skin automatisch zu.",
+      "Padding pro Sektion: Hero, Contact und Final-CTA großzügig (lg), Kennzahlenleiste kompakt (sm), alle übrigen Sektionen standardmäßig (md) — via clamp() aus den Spacing-Tokens abgeleitet.",
     ],
   },
   {
@@ -147,16 +172,20 @@ export const PAGE_ARCHITECTURES: PageArchitecture[] = [
         copyHint: "Headline + Subheadline + primärer CTA + Sekundär-Link ('Mehr erfahren').",
       },
       { slotId: "trust-strip", title: "Kennzahlenleiste", purpose: "Sofortiger Trust unter dem Hero.", copyHint: "3–4 Kennzahlen mit kurzer Beschreibung." },
-      { slotId: "value-props", title: "Nutzen & Bausteine", purpose: "Was der Kunde konkret bekommt.", copyHint: "3–6 Nutzen-Karten mit Icon und Kurztext." },
-      { slotId: "trust", title: "Fördermechanik / Garantie", purpose: "Risiko-Umkehr.", copyHint: "Fördermechanismus oder Geld-zurück-Garantie prominent erklären." },
-      { slotId: "about", title: "Team / Ansprechperson", purpose: "Menschen kaufen von Menschen.", copyHint: "Foto + Werdegang + Spezialisierungs-Tags." },
-      { slotId: "problem", title: "Prozess", purpose: "Ablauf transparent machen.", copyHint: "3–5 nummerierte Schritte." },
-      { slotId: "social-proof", title: "Testimonials", purpose: "Beweise, dass es funktioniert.", copyHint: "4–6 Zitate mit Namen und Rollen." },
-      { slotId: "objection", title: "FAQ-Kurzversion", purpose: "Häufigste Einwände abfangen.", copyHint: "5–7 Fragen im Akkordeon." },
+      { slotId: "audience", title: "Zielgruppenansprache (optional)", purpose: "'Für dich, wenn du …' — direkte Ansprache.", copyHint: "H2 + 4–5 Bullets." },
+      { slotId: "value-props", title: "Leistungen / Bausteine", purpose: "Was der Kunde konkret bekommt.", copyHint: "3–6 Nutzen-Karten mit Icon und Kurztext." },
+      { slotId: "process", title: "Ablauf (mit CTA)", purpose: "Ablauf transparent machen, CTA am Ende.", copyHint: "3–5 nummerierte Schritte + primärer CTA." },
+      { slotId: "about", title: "About / Warum wir", purpose: "Menschen kaufen von Menschen — Team, Werte, Fördermechanik/Garantie.", copyHint: "Foto + Werdegang + Werte + Risiko-Umkehr." },
+      { slotId: "social-proof", title: "Case Studies / Testimonials", purpose: "Beweise, dass es funktioniert.", copyHint: "4–6 Zitate mit Namen und Rollen." },
+      { slotId: "blog", title: "Blog (optional, über der FAQ)", purpose: "Content-Autorität.", copyHint: "3 aktuelle Artikel-Karten." },
+      { slotId: "objection", title: "FAQ (immer direkt vor Contact)", purpose: "Häufigste Einwände abfangen.", copyHint: "5–7 Fragen im Akkordeon." },
+      { slotId: "contact", title: "Contact / Formular", purpose: "Conversion-Punkt.", copyHint: "4–5 Felder + Datenschutz-Hinweis." },
       { slotId: "final-cta", title: "Abschluss-CTA", purpose: "Letzter Conversion-Punkt.", copyHint: "H2 + primärer CTA + Micro-Copy." },
     ],
     rules: [
-      "Der primäre CTA erscheint mindestens 3× (Hero, Mitte, Abschluss).",
+      "Reihenfolge ist verbindlich: Hero → Trust → (Audience) → Leistungen → Ablauf → About → (Case Studies) → (Blog) → FAQ → Contact/Final-CTA.",
+      "FAQ steht IMMER direkt vor Contact/Final-CTA — Blog nur oberhalb der FAQ oder gar nicht.",
+      "Der primäre CTA erscheint mindestens 3× (Hero, Ablauf, Abschluss).",
       "Mobile Navigation als Off-Canvas-Menü.",
     ],
   },

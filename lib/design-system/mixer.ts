@@ -43,16 +43,20 @@ export type ConversionSlotId =
   | "announcement"
   | "hero"
   | "trust-strip"
+  | "audience"
   | "problem"
   | "value-props"
   | "showcase"
+  | "process"
   | "engagement"
+  | "about"
   | "social-proof"
-  | "objection"
+  | "blog"
   | "pricing"
   | "urgency"
-  | "final-cta"
+  | "objection"
   | "contact"
+  | "final-cta"
   | "trust"
   | "footer";
 
@@ -65,23 +69,34 @@ export interface ConversionSlot {
   defaultCategories: ConversionCategory[];
 }
 
+// Feste Section-Reihenfolge jeder Startseite. Regel (verbindlich):
+//   Hero → Trust → (Zielgruppenansprache) → Leistungen/Angebote → Ablauf (mit
+//   CTA) → About (Warum) → (Case Studies / Trust) → (Blog) → FAQ → Contact /
+//   Final-CTA → Footer.
+// FAQ (objection) steht IMMER unmittelbar vor Contact/Final-CTA. Blog steht
+// ausschließlich über der FAQ oder gar nicht. Pricing/Urgency/Announcement
+// bleiben als optionale Ergänzungs-Slots erhalten, folgen aber demselben Fluss.
 export const CONVERSION_FRAME: ConversionSlot[] = [
   { id: "nav",           label: "Navigation",              role: "structure",  required: true,  defaultCategories: ["structure", "nav-creative"] },
   { id: "announcement",  label: "Ankündigungsleiste",      role: "attention",  required: false, defaultCategories: ["hero"] },
   { id: "hero",          label: "Hero (Value Proposition)", role: "attention", required: true,  defaultCategories: ["hero", "hero-creative"] },
-  { id: "trust-strip",   label: "Trust-Streifen (Logos)",   role: "trust",     required: false, defaultCategories: ["social-proof"] },
-  { id: "problem",       label: "Problem / Story",          role: "value",     required: false, defaultCategories: ["content", "about", "story-scroll"] },
-  { id: "value-props",   label: "Nutzen & Features",        role: "value",     required: true,  defaultCategories: ["services", "content", "showcase"] },
-  { id: "showcase",      label: "Produkt-Showcase",         role: "value",     required: false, defaultCategories: ["showcase", "gallery-creative", "bento", "commerce", "media"] },
-  { id: "engagement",    label: "Interaktion",              role: "value",     required: false, defaultCategories: ["engagement", "interactive-creative"] },
-  { id: "social-proof",  label: "Social Proof",             role: "proof",     required: true,  defaultCategories: ["social-proof", "social-creative"] },
-  { id: "objection",     label: "Einwände (FAQ / PAS)",     role: "proof",     required: false, defaultCategories: ["content"] },
-  { id: "pricing",       label: "Pricing",                  role: "conversion",required: false, defaultCategories: ["pricing"] },
-  { id: "urgency",       label: "Dringlichkeit",            role: "conversion",required: false, defaultCategories: ["urgency"] },
-  { id: "final-cta",     label: "Finaler Call-to-Action",   role: "conversion",required: true,  defaultCategories: ["cta"] },
-  { id: "contact",       label: "Kontakt",                  role: "conversion",required: false, defaultCategories: ["contact"] },
-  { id: "trust",         label: "Trust-Signale",            role: "close",     required: false, defaultCategories: ["trust"] },
-  { id: "footer",        label: "Footer",                   role: "structure", required: true,  defaultCategories: ["structure", "footer-creative"] },
+  { id: "trust-strip",   label: "Trust-Streifen / Kennzahlen", role: "trust",  required: true,  defaultCategories: ["social-proof", "content"] },
+  { id: "audience",      label: "Zielgruppenansprache",    role: "value",      required: false, defaultCategories: ["content", "about"] },
+  { id: "problem",       label: "Problem / Story",         role: "value",      required: false, defaultCategories: ["content", "about", "story-scroll"] },
+  { id: "value-props",   label: "Leistungen & Angebote",   role: "value",      required: true,  defaultCategories: ["services", "content", "showcase"] },
+  { id: "showcase",      label: "Produkt-Showcase",        role: "value",      required: false, defaultCategories: ["showcase", "gallery-creative", "bento", "commerce", "media"] },
+  { id: "process",       label: "Ablauf / Prozess",        role: "value",      required: false, defaultCategories: ["content", "engagement"] },
+  { id: "engagement",    label: "Interaktion",             role: "value",      required: false, defaultCategories: ["engagement", "interactive-creative"] },
+  { id: "about",         label: "About (Warum wir)",       role: "value",      required: false, defaultCategories: ["about", "content"] },
+  { id: "social-proof",  label: "Case Studies / Testimonials", role: "proof",  required: true,  defaultCategories: ["social-proof", "social-creative"] },
+  { id: "blog",          label: "Blog / Ressourcen",       role: "proof",      required: false, defaultCategories: ["content", "editorial"] },
+  { id: "pricing",       label: "Pricing",                 role: "conversion", required: false, defaultCategories: ["pricing"] },
+  { id: "urgency",       label: "Dringlichkeit",           role: "conversion", required: false, defaultCategories: ["urgency"] },
+  { id: "objection",     label: "FAQ (Einwände)",          role: "proof",      required: false, defaultCategories: ["content"] },
+  { id: "contact",       label: "Kontakt",                 role: "conversion", required: false, defaultCategories: ["contact"] },
+  { id: "final-cta",     label: "Finaler Call-to-Action",  role: "conversion", required: true,  defaultCategories: ["cta"] },
+  { id: "trust",         label: "Trust-Signale (Abschluss)", role: "close",    required: false, defaultCategories: ["trust"] },
+  { id: "footer",        label: "Footer",                  role: "structure",  required: true,  defaultCategories: ["structure", "footer-creative"] },
 ];
 
 export function getConversionSlot(id: ConversionSlotId): ConversionSlot {
@@ -128,17 +143,20 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
     id: "dual-pillar",
     name: "Zwei-Säulen-Startseite",
     description:
-      "Dachseite für Marken mit zwei gleichwertigen Leistungen (z. B. Gründungs- + Karrierecoaching). Doppel-CTA im Hero, Zwei-Säulen-Kacheln, geteilter Fördermechanik-Block, Doppelspitze und gemeinsamer Anspruchs-Check.",
+      "Dachseite für Marken mit zwei gleichwertigen Leistungen (z. B. Gründungs- + Karrierecoaching). Feste Reihenfolge: Hero → Trust → Zielgruppenansprache → Leistungen → Ablauf → About → Case Studies → Blog → FAQ → Contact/CTA.",
     styleId: "21-conversion-optimized",
     slots: {
       nav: STRUCTURE_NAV,
       hero: ["hero"],
-      "trust-strip": ["content"],
+      "trust-strip": ["content", "social-proof"],
+      audience: ["content", "about"],
       "value-props": ["services", "content"],
-      trust: ["trust"],
-      problem: ["content"],
+      process: ["content", "engagement"],
+      about: ["about", "content"],
       "social-proof": ["social-proof"],
+      blog: ["content", "editorial"],
       objection: ["content"],
+      contact: ["contact"],
       "final-cta": ["cta"],
       footer: STRUCTURE_FOOTER,
     },
@@ -389,8 +407,8 @@ export type SectionSkin = "bg" | "surface" | "tint" | "inverse";
 
 /** Kompakte, harte Sektionen (Padding-Modifikator "sm"). */
 const COMPACT_ROLES = new Set<ConversionSlot["role"]>(["structure"]);
-/** Aufmerksamkeits-Sektionen — Hero, Final-CTA — brauchen mehr Luft. */
-const LARGE_SLOTS = new Set<ConversionSlotId>(["hero", "final-cta"]);
+/** Aufmerksamkeits-Sektionen — Hero, Final-CTA, Contact — brauchen mehr Luft. */
+const LARGE_SLOTS = new Set<ConversionSlotId>(["hero", "final-cta", "contact"]);
 /** Slots, die vom Rhythmus ausgenommen sind (Nav / Footer haben ihr eigenes Chrome). */
 const NO_RHYTHM_SLOTS = new Set<ConversionSlotId>(["nav", "footer", "announcement"]);
 
@@ -420,8 +438,9 @@ function assignSkin(
   previousSkin: SectionSkin | undefined,
 ): SectionSkin {
   if (NO_RHYTHM_SLOTS.has(slot.id)) return "bg";
-  // Akzent-Sektionen
-  if (slot.id === "trust" || slot.id === "final-cta") return "tint";
+  // Akzent-Sektionen: Trust-Streifen unter Hero, About-Block, Final-CTA.
+  if (slot.id === "trust" || slot.id === "trust-strip" || slot.id === "final-cta")
+    return "tint";
   // Alternation: bevorzugt gegenteilig zum vorherigen Skin.
   if (previousSkin === "surface" || previousSkin === "tint") return "bg";
   if (previousSkin === "bg") return "surface";
@@ -540,14 +559,14 @@ const CATEGORY_TO_SLOT: Partial<Record<string, ConversionSlotId>> = {
   hero: "hero",
   "hero-creative": "hero",
   "typography-art": "hero",
-  about: "problem",
+  about: "about",
   services: "value-props",
   "social-proof": "social-proof",
   "social-creative": "social-proof",
   media: "showcase",
   cta: "final-cta",
   pricing: "pricing",
-  engagement: "engagement",
+  engagement: "process",
   urgency: "urgency",
   content: "value-props",
   contact: "contact",
@@ -560,15 +579,29 @@ const CATEGORY_TO_SLOT: Partial<Record<string, ConversionSlotId>> = {
   "footer-creative": "footer",
   "nav-creative": "nav",
   commerce: "showcase",
-  editorial: "value-props",
+  editorial: "blog",
   decor: "value-props",
-  "interactive-creative": "engagement",
+  "interactive-creative": "process",
   "scroll-motion": "showcase",
   fintech: "value-props",
   "industrial-b2b": "value-props",
   "story-scroll": "problem",
   "technical-spec": "value-props",
 };
+
+// Feinere ID-basierte Zuordnung — überschreibt die Kategorie-Zuordnung, wenn
+// die Komponenten-ID einem konkreten Slot eindeutig zuzuordnen ist (z. B.
+// FAQ → objection, Prozess-Schritte → process, Blog-Teaser → blog).
+const ID_TO_SLOT: Array<{ pattern: RegExp; slotId: ConversionSlotId }> = [
+  { pattern: /^faq/, slotId: "objection" },
+  { pattern: /^blog/, slotId: "blog" },
+  { pattern: /process-steps|quiz-funnel|progress-form/, slotId: "process" },
+  { pattern: /^about|team-showcase|timeline|awards/, slotId: "about" },
+  { pattern: /^contact/, slotId: "contact" },
+  { pattern: /pas-narrative/, slotId: "audience" },
+  { pattern: /pricing|comparison|roi-calculator/, slotId: "pricing" },
+  { pattern: /countdown|limited-availability|exit-intent|abandonment/, slotId: "urgency" },
+];
 
 export interface RhythmAssignment {
   componentId: string;
@@ -582,18 +615,41 @@ export interface RhythmAssignment {
  * Live-Preview genutzt, damit auch manuell zusammengestellte Seiten den
  * Auto-Alternation-Rhythm bekommen.
  */
+function resolveSlotForId(id: string): ConversionSlotId {
+  const comp = getComponentById(id);
+  if (!comp) return "value-props";
+  // Struktur-Sonderfälle zuerst.
+  if (/(^|-)footer($|-)/.test(comp.id)) return "footer";
+  if (/^nav|-nav($|-)|navbar/.test(comp.id)) return "nav";
+  if (comp.id === "announcement-bar") return "announcement";
+  // Feinere ID-Muster überschreiben die Kategorie-Zuordnung.
+  for (const { pattern, slotId } of ID_TO_SLOT) {
+    if (pattern.test(comp.id)) return slotId;
+  }
+  return CATEGORY_TO_SLOT[comp.category] ?? "value-props";
+}
+
+/**
+ * Bringt IDs in die vom CONVERSION_FRAME vorgegebene Reihenfolge und stellt
+ * sicher, dass FAQ immer direkt vor Contact/Final-CTA landet, Blog immer
+ * über der FAQ, About vor Case Studies etc. IDs mit gleichem Slot behalten
+ * ihre relative Eingabereihenfolge (stabil).
+ */
+export function reorderIdsByFrame(ids: string[]): string[] {
+  const framePos = new Map<ConversionSlotId, number>();
+  CONVERSION_FRAME.forEach((s, i) => framePos.set(s.id, i));
+  return [...ids]
+    .map((id, i) => ({ id, i, pos: framePos.get(resolveSlotForId(id)) ?? 999 }))
+    .sort((a, b) => (a.pos - b.pos) || (a.i - b.i))
+    .map((x) => x.id);
+}
+
 export function assignRhythmForIds(ids: string[]): RhythmAssignment[] {
+  const ordered = reorderIdsByFrame(ids);
   const result: RhythmAssignment[] = [];
   let prevSkin: SectionSkin | undefined;
-  ids.forEach((id, i) => {
-    const comp = getComponentById(id);
-    if (!comp) return;
-    // Footer- / Nav-Sonderfälle: unabhängig von Kategorie erkennen.
-    let slotId: ConversionSlotId;
-    if (/(^|-)footer($|-)/.test(comp.id)) slotId = "footer";
-    else if (/^nav|-nav($|-)|navbar/.test(comp.id)) slotId = "nav";
-    else if (comp.id === "announcement-bar") slotId = "announcement";
-    else slotId = CATEGORY_TO_SLOT[comp.category] ?? "value-props";
+  ordered.forEach((id, i) => {
+    const slotId = resolveSlotForId(id);
     const slot = CONVERSION_FRAME.find((s) => s.id === slotId) ?? getConversionSlot("value-props");
     const skin = assignSkin(slot, i, prevSkin);
     result.push({
