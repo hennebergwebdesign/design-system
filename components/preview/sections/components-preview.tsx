@@ -11,6 +11,7 @@ import {
 import { COMPONENT_BASE_CSS } from "@/lib/design-system/component-css";
 import { CREATIVE_CSS } from "@/lib/design-system/creative-components";
 import { INSPIRED_CSS } from "@/lib/design-system/inspired-components";
+import { assignRhythmForIds, skinClass } from "@/lib/design-system/mixer";
 
 export function ComponentsPreview({ system }: { system: DesignSystem }) {
   const { selectedIds, slotOverrides } = useComponentStore();
@@ -26,6 +27,10 @@ export function ComponentsPreview({ system }: { system: DesignSystem }) {
     );
   }
 
+  // Auto-Alternation: jeder Sektion wird ein Skin (bg | surface | tint)
+  // zugewiesen, damit benachbarte Sektionen sich visuell absetzen.
+  const rhythm = assignRhythmForIds(selectedIds);
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
       {/* Geteiltes Komponenten-CSS für selbst-rendernde Templates */}
@@ -34,13 +39,15 @@ export function ComponentsPreview({ system }: { system: DesignSystem }) {
         const comp = getComponentById(id);
         if (!comp) return null;
         const overrides = slotOverrides[id] ?? {};
+        const r = rhythm[index];
         return (
-          <ComponentRenderer
-            key={`${id}-${index}`}
-            comp={comp}
-            overrides={overrides}
-            system={system}
-          />
+          <div key={`${id}-${index}`} className={r ? skinClass(r.skin) : "ds-rhythm ds-rhythm-bg"}>
+            <ComponentRenderer
+              comp={comp}
+              overrides={overrides}
+              system={system}
+            />
+          </div>
         );
       })}
     </div>

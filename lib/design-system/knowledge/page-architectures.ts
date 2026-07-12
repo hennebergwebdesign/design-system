@@ -127,6 +127,8 @@ export const PAGE_ARCHITECTURES: PageArchitecture[] = [
       "Der Anspruchs-/Eignungs-Check ist der geteilte primäre CTA — er erscheint mindestens in Hero, Trust-Block, Prozess, FAQ und Abschluss.",
       "Mobil werden die Zwei-Säulen-Kacheln gestapelt (nicht nebeneinander), damit jede Säule denselben Above-the-Fold-Raum bekommt.",
       "Navigation auf Mobil als Off-Canvas-Menü — hält Hero + Doppel-CTA sauber und zeigt den primären CTA prominent im geöffneten Panel.",
+      "Sektionen wechseln immer sichtbar den Hintergrund (bg ↔ surface, mit Tint-Akzent auf AVGS-Block und Final-CTA) — der Mixer weist das Skin automatisch zu.",
+      "Padding pro Sektion: Hero und Final-CTA großzügig (lg), Kennzahlenleiste kompakt (sm), alle übrigen Sektionen standardmäßig (md) — via clamp() aus den Spacing-Tokens abgeleitet.",
     ],
   },
   {

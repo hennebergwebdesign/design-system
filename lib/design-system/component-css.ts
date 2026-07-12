@@ -3,11 +3,28 @@
 
 export const COMPONENT_BASE_CSS = `
 /* ═══ Layout ═══ */
-.ds-section { padding: clamp(40px, 6vw, 80px) clamp(16px, 4vw, 48px); }
+/* Padding-Skala: vertikal groß, horizontal enger — folgt Spacing-Tokens. */
+.ds-section { padding: clamp(48px, 8vw, 112px) clamp(16px, 5vw, 48px); position: relative; }
+.ds-section.ds-sec-sm { padding-block: clamp(28px, 4vw, 56px); } /* Trust-Strip, Announcement, CTA */
+.ds-section.ds-sec-lg { padding-block: clamp(72px, 10vw, 144px); } /* Hero, Feature-Grid, Final-CTA */
 .ds-container { max-width: 1080px; margin-inline: auto; }
 .ds-text-center { text-align: center; }
 .ds-surface { background-color: var(--ds-surface); }
 .ds-flex-center { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; }
+
+/* ═══ Section-Rhythm (Auto-Alternation) ═══ */
+/* Der Mixer weist jeder Sektion ein Skin (bg | surface | tint) zu, damit
+   benachbarte Sektionen sich immer subtil unterscheiden. Der Wrapper setzt
+   den Hintergrund; einzelne Komponenten dürfen ihn nicht mehr inline
+   überschreiben. */
+.ds-rhythm { width: 100%; }
+.ds-rhythm-bg { background-color: var(--ds-bg); }
+.ds-rhythm-surface { background-color: var(--ds-surface); }
+.ds-rhythm-tint { background-color: color-mix(in oklab, var(--ds-primary) 8%, var(--ds-bg)); }
+.ds-rhythm-inverse { background-color: var(--ds-text); color: var(--ds-bg); }
+/* Sichtbarer Divider, wenn zwei benachbarte Sektionen identische Farbe haben. */
+.ds-rhythm + .ds-rhythm-bg.ds-rhythm-adj { border-top: var(--ds-border-w) solid var(--ds-border); }
+.ds-rhythm + .ds-rhythm-surface.ds-rhythm-adj { border-top: var(--ds-border-w) solid var(--ds-border); }
 
 /* ═══ Typography ═══ */
 .ds-h1 { font-family: var(--ds-font-heading); font-size: clamp(28px, 4vw, 48px); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; color: var(--ds-text); }

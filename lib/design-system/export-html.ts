@@ -10,6 +10,7 @@ import {
   renderTemplate,
   type ConversionComponentDef,
 } from "./conversion-components";
+import { assignRhythmForIds, skinClass } from "./mixer";
 import { COMPONENT_BASE_CSS } from "./component-css";
 import { CREATIVE_CSS } from "./creative-components";
 import { INSPIRED_CSS } from "./inspired-components";
@@ -901,11 +902,16 @@ export function generateExportHtml(options: ExportOptions): string {
     cssVarsSection = `:root {\n${mode === "light" ? lightVars : darkVars}\n}`;
   }
 
+  const rhythm = assignRhythmForIds(selectedIds);
   const componentsHtml = selectedIds
-    .map((id) => {
+    .map((id, i) => {
       const comp = CONVERSION_COMPONENTS.find((c) => c.id === id);
       if (!comp) return "";
-      return renderComponentHtml(comp, slotOverrides[id] ?? {});
+      const inner = renderComponentHtml(comp, slotOverrides[id] ?? {});
+      if (!inner) return "";
+      const r = rhythm[i];
+      const cls = r ? skinClass(r.skin) : "ds-rhythm ds-rhythm-bg";
+      return `<div class="${cls}">\n${inner}\n</div>`;
     })
     .filter(Boolean)
     .join("\n\n");
