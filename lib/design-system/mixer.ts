@@ -25,6 +25,10 @@ import {
   CTA_MIN_OCCURRENCES,
   TRUST_ELEMENTS,
 } from "./knowledge/conversion-playbook";
+import {
+  PAGE_ARCHITECTURES,
+  type PageArchitecture,
+} from "./knowledge/page-architectures";
 import { contrastRatio, readableTextColor } from "./color";
 import { deriveSurfaces } from "./derive";
 import type { DesignSystem } from "./types";
@@ -111,12 +115,34 @@ export interface MixerTemplate {
   slots: Partial<Record<ConversionSlotId, SlotConfig>>;
 }
 
-const STRUCTURE_NAV: SlotConfig = { ids: ["navbar"] };
+// Mobile-First: die Off-Canvas-Nav ist der neue Default. Sie funktioniert auf
+// Desktop als klassische Sticky-Navbar und klappt auf ≤ 768 px in ein
+// Off-Canvas-Panel — Regel aus PAGE_ARCHITECTURES / MOBILE_NAV_RULE.
+const STRUCTURE_NAV: SlotConfig = { ids: ["navbar-offcanvas"] };
 const STRUCTURE_FOOTER: SlotConfig = { ids: ["footer"] };
 const CREATIVE_NAV: SlotConfig = ["nav-creative"];
 const CREATIVE_FOOTER: SlotConfig = ["footer-creative"];
 
 export const MIXER_TEMPLATES: MixerTemplate[] = [
+  {
+    id: "dual-pillar",
+    name: "Zwei-Säulen-Startseite",
+    description:
+      "Dachseite für Marken mit zwei gleichwertigen Leistungen (z. B. Gründungs- + Karrierecoaching). Doppel-CTA im Hero, Zwei-Säulen-Kacheln, geteilter Fördermechanik-Block, Doppelspitze und gemeinsamer Anspruchs-Check.",
+    styleId: "21-conversion-optimized",
+    slots: {
+      nav: STRUCTURE_NAV,
+      hero: ["hero"],
+      "trust-strip": ["content"],
+      "value-props": ["services", "content"],
+      trust: ["trust"],
+      problem: ["content"],
+      "social-proof": ["social-proof"],
+      objection: ["content"],
+      "final-cta": ["cta"],
+      footer: STRUCTURE_FOOTER,
+    },
+  },
   {
     id: "landing",
     name: "Conversion-Landingpage",
@@ -296,6 +322,30 @@ export function getMixerTemplateStyle(template: MixerTemplate): KnowledgeStyle |
 export function getMixerTemplateById(id: string): MixerTemplate | undefined {
   return MIXER_TEMPLATES.find((t) => t.id === id);
 }
+
+// ── Seitenarchitekturen (Grundlagen des Mixers) ─────────────────────────
+// Templates legen fest, WELCHE Slots aktiv sind. Die PAGE_ARCHITECTURES
+// beschreiben zusätzlich, WIE die Sektionen strategisch aufgebaut werden
+// (Reihenfolge, Zweck, Copy-Hinweis). Sie sind eine der Grundlagen des
+// Mixers und werden hier für die UI ausgeliefert.
+
+/** Ordnet einem Mixer-Template ein optionales Architektur-Blueprint zu. */
+const TEMPLATE_TO_ARCHITECTURE: Record<string, string> = {
+  "dual-pillar": "dual-pillar-homepage",
+  landing: "single-service-homepage",
+  corporate: "single-service-homepage",
+};
+
+export function getPageArchitectureForTemplate(
+  template: MixerTemplate,
+): PageArchitecture | undefined {
+  const id = TEMPLATE_TO_ARCHITECTURE[template.id];
+  if (!id) return undefined;
+  return PAGE_ARCHITECTURES.find((a) => a.id === id);
+}
+
+export { PAGE_ARCHITECTURES } from "./knowledge/page-architectures";
+export type { PageArchitecture, PageSectionBlueprint } from "./knowledge/page-architectures";
 
 // ── Mixing ──────────────────────────────────────────────────────────────
 

@@ -746,6 +746,59 @@ const BASE_COMPONENTS: ConversionComponentDef[] = [
     ],
   },
   {
+    id: "navbar-offcanvas",
+    category: "structure",
+    name: "Navbar mit Off-Canvas-Menü (Mobile-First)",
+    description:
+      "Klebende Kopfzeile mit Logo und CTA. Auf dem Desktop erscheinen die Menüpunkte inline, auf mobilen Geräten öffnet ein Hamburger-Icon ein Off-Canvas-Panel mit Overlay.",
+    conversionTip:
+      "Off-Canvas-Menüs sind der Mobile-Standard: Sie halten den Above-the-Fold frei für Hero + CTA und geben trotzdem jederzeit Zugriff auf alle Ziele. Der primäre CTA bleibt sowohl in der Topbar als auch prominent im Panel sichtbar.",
+    slots: [
+      { key: "brand", label: "Marke / Logo-Text", type: "text", default: "Ihre Marke" },
+      { key: "links", label: "Menüpunkte (kommagetrennt)", type: "text", default: "Start, Leistungen, Über uns, FAQ, Kontakt" },
+      { key: "ctaText", label: "CTA Text", type: "text", default: "Termin buchen" },
+      { key: "menuLabel", label: "Menü-Label (Screenreader)", type: "text", default: "Menü öffnen" },
+    ],
+    render: ({ s }) => {
+      const links = s("links")
+        .split(",")
+        .map((l) => l.trim())
+        .filter(Boolean);
+      const linksDesktop = links
+        .map((l) => `<a href="#" class="ds-nav-link">${l}</a>`)
+        .join("");
+      const linksMobile = links
+        .map((l, i) => `<a href="#" class="ds-oc-link"><span class="ds-oc-num">0${i + 1}</span>${l}</a>`)
+        .join("");
+      return `<header class="ds-navbar-off" data-component="navbar-offcanvas">
+  <input type="checkbox" id="ds-oc-toggle" class="ds-oc-toggle" aria-hidden="true">
+  <a href="#top" class="ds-nav-brand">${s("brand")}</a>
+  <nav class="ds-nav-links ds-oc-desktop" aria-label="Hauptnavigation">
+    ${linksDesktop}
+  </nav>
+  <div class="ds-oc-actions">
+    <a href="#" class="ds-btn-primary ds-oc-cta-top">${s("ctaText")}</a>
+    <label for="ds-oc-toggle" class="ds-oc-burger" aria-label="${s("menuLabel")}" role="button" tabindex="0">
+      <span></span><span></span><span></span>
+    </label>
+  </div>
+  <label for="ds-oc-toggle" class="ds-oc-backdrop" aria-hidden="true"></label>
+  <aside class="ds-oc-panel" role="dialog" aria-modal="true" aria-label="Navigation">
+    <div class="ds-oc-panel-head">
+      <span class="ds-nav-brand">${s("brand")}</span>
+      <label for="ds-oc-toggle" class="ds-oc-close" aria-label="Menü schließen" role="button" tabindex="0">✕</label>
+    </div>
+    <nav class="ds-oc-nav" aria-label="Mobile Navigation">
+      ${linksMobile}
+    </nav>
+    <div class="ds-oc-panel-foot">
+      <a href="#" class="ds-btn-primary ds-oc-cta">${s("ctaText")}</a>
+    </div>
+  </aside>
+</header>`;
+    },
+  },
+  {
     id: "footer",
     category: "structure",
     name: "Footer (mehrspaltig)",
