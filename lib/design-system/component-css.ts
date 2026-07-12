@@ -330,6 +330,36 @@ export const COMPONENT_BASE_CSS = `
 .ds-lightbox.ds-open { display: flex; }
 .ds-lightbox-img { width: min(80vw, 800px); aspect-ratio: 4/3; background-color: var(--ds-neutral-200); border-radius: var(--ds-radius-lg); display: flex; align-items: center; justify-content: center; color: var(--ds-text-muted); font-family: var(--ds-font-body); }
 
+/* ═══ Navbar mit Off-Canvas-Menü (Mobile-First) ═══ */
+.ds-navbar-off { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px clamp(16px, 4vw, 24px); background-color: color-mix(in oklab, var(--ds-bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: var(--ds-border-w) solid var(--ds-border); font-family: var(--ds-font-body); }
+.ds-oc-toggle { position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0; }
+.ds-oc-desktop { display: flex; }
+.ds-oc-actions { display: flex; align-items: center; gap: 12px; }
+.ds-oc-cta-top { padding: 8px 16px; font-size: 13px; }
+.ds-oc-burger { display: none; width: 40px; height: 40px; cursor: pointer; align-items: center; justify-content: center; border-radius: var(--ds-radius-md); border: var(--ds-border-w) solid var(--ds-border); background-color: var(--ds-bg); flex-direction: column; gap: 4px; padding: 0; }
+.ds-oc-burger span { display: block; width: 18px; height: 2px; background-color: var(--ds-text); border-radius: 2px; transition: transform 0.25s ease, opacity 0.2s ease; }
+.ds-oc-panel { position: fixed; top: 0; right: 0; bottom: 0; z-index: 60; width: min(88vw, 360px); background-color: var(--ds-bg); border-left: var(--ds-border-w) solid var(--ds-border); box-shadow: var(--ds-shadow-2xl); transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; visibility: hidden; }
+.ds-oc-backdrop { position: fixed; inset: 0; z-index: 55; background-color: rgba(0, 0, 0, 0.5); opacity: 0; visibility: hidden; transition: opacity 0.25s ease; cursor: pointer; }
+.ds-oc-toggle:checked ~ .ds-oc-panel { transform: translateX(0); visibility: visible; }
+.ds-oc-toggle:checked ~ .ds-oc-backdrop { opacity: 1; visibility: visible; }
+.ds-oc-toggle:checked ~ .ds-oc-actions .ds-oc-burger span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.ds-oc-toggle:checked ~ .ds-oc-actions .ds-oc-burger span:nth-child(2) { opacity: 0; }
+.ds-oc-toggle:checked ~ .ds-oc-actions .ds-oc-burger span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+.ds-oc-panel-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: var(--ds-border-w) solid var(--ds-border); }
+.ds-oc-close { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: var(--ds-radius-md); font-size: 18px; color: var(--ds-text); }
+.ds-oc-close:hover { background-color: var(--ds-surface); }
+.ds-oc-nav { display: flex; flex-direction: column; padding: 12px 12px; gap: 2px; overflow-y: auto; flex: 1; }
+.ds-oc-link { display: flex; align-items: baseline; gap: 14px; padding: 14px 16px; font-size: 18px; font-weight: 500; color: var(--ds-text); text-decoration: none; border-radius: var(--ds-radius-md); font-family: var(--ds-font-heading); }
+.ds-oc-link:hover { background-color: var(--ds-surface); }
+.ds-oc-num { font-size: 11px; font-weight: 600; color: var(--ds-text-muted); letter-spacing: 0.05em; min-width: 20px; font-family: var(--ds-font-body); }
+.ds-oc-panel-foot { padding: 20px 24px; border-top: var(--ds-border-w) solid var(--ds-border); }
+.ds-oc-cta { display: block; text-align: center; padding: 12px 20px; width: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  .ds-oc-panel { transition: none; }
+  .ds-oc-backdrop { transition: none; }
+  .ds-oc-burger span { transition: none; }
+}
+
 /* ═══ Responsive ═══ */
 @media (max-width: 768px) {
   .ds-stats-grid { grid-template-columns: 1fr; gap: 24px; }
@@ -339,5 +369,8 @@ export const COMPONENT_BASE_CSS = `
   .ds-countdown-value { font-size: 24px; padding: 8px 12px; min-width: 50px; }
   .ds-sticky-aside { position: static; top: auto; }
   .ds-nav-links { gap: 14px; }
+  .ds-oc-desktop { display: none; }
+  .ds-oc-burger { display: flex; }
+  .ds-oc-cta-top { display: none; }
 }
 `;
