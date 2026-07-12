@@ -27,9 +27,9 @@ export function ComponentsPreview({ system }: { system: DesignSystem }) {
     );
   }
 
-  // Feste Section-Reihenfolge erzwingen (Hero → Trust → Zielgruppe →
-  // Leistungen → Ablauf → About → Case Studies → Blog → FAQ → Contact/
-  // Final-CTA → Footer) und danach Auto-Alternation-Skin zuweisen.
+  // Feste Section-Reihenfolge erzwingen (Hero → Leistungen → Problem/About →
+  // Vorteile → Ablauf → CTA → Blog → FAQ → Kontakt → Footer) und danach
+  // Auto-Alternation-Skin zuweisen.
   const orderedIds = reorderIdsByFrame(selectedIds);
   const rhythm = assignRhythmForIds(orderedIds);
 

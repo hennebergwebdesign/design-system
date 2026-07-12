@@ -66,7 +66,7 @@ export function MixerPanel() {
   return (
     <PanelShell
       title="Komponenten-Mixer"
-      description="Jede Seite folgt derselben Conversion-Struktur – Nav → Hero → Trust → Nutzen → Beweis → CTA → Kontakt → Footer. Je nach Seitentyp werden einzelne Slots ergänzt oder ausgelassen, die Grundstruktur bleibt immer erhalten."
+      description="Jede Seite folgt derselben Conversion-Struktur – Nav → Hero → Leistungen → Problem/About → Vorteile → Ablauf → CTA → (Blog) → FAQ → Kontakt → Footer. Je nach Seitentyp werden einzelne Slots ergänzt oder ausgelassen, die Grundstruktur bleibt immer erhalten."
     >
       <PanelGroup label="Seitentyp">
         <div className="space-y-2">
