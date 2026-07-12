@@ -77,6 +77,14 @@ export interface ConversionSlot {
   required: boolean;
   /** Katalog-Kategorien, aus denen dieser Slot standardmäßig kandidiert. */
   defaultCategories: ConversionCategory[];
+  /**
+   * Kuratierte Komponenten-IDs, die den Slot beim Auto-Fill sicher belegen.
+   * Nötig für Backbone-Slots (Leistungen, About, Vorteile, Ablauf, FAQ,
+   * Kontakt), deren Kategorie ("content") ein Sammelbecken ist – so landet
+   * garantiert die passende Komponente im Slot und nicht z. B. eine FAQ im
+   * Ablauf. Templates dürfen den Slot weiterhin thematisch überschreiben.
+   */
+  defaultIds?: string[];
 }
 
 // Feste Section-Reihenfolge jeder Startseite. Regel (verbindlich):
@@ -91,27 +99,33 @@ export interface ConversionSlot {
 //   • Pricing ist bewusst kein Mixer-Slot mehr (auf Wunsch nicht implementiert).
 // Urgency/Announcement/Trust bleiben optionale Ergänzungs-Slots, folgen aber
 // demselben Fluss.
+// Backbone (required:true) = das Grundgerüst, das JEDE Generation enthält:
+//   Nav → Hero → Leistungen → About → Vorteile → Ablauf → CTA → FAQ →
+//   Kontakt → Footer. Diese Slots werden bei jedem Seitentyp aufgefüllt –
+//   nur ihre optische Ausgestaltung (Komponente) variiert je Template.
+// Optionale Slots (required:false) sind thematische Ergänzungen, die sich je
+//   nach Projektart dazwischenschieben dürfen, die Reihenfolge aber nie brechen.
 export const CONVERSION_FRAME: ConversionSlot[] = [
-  { id: "nav",           label: "Navigation (mit CTA)",    role: "structure",  required: true,  defaultCategories: ["structure", "nav-creative"] },
+  { id: "nav",           label: "Navigation (mit CTA)",    role: "structure",  required: true,  defaultCategories: ["structure", "nav-creative"], defaultIds: ["navbar-offcanvas"] },
   { id: "announcement",  label: "Ankündigungsleiste",      role: "attention",  required: false, defaultCategories: ["hero"] },
-  { id: "hero",          label: "Hero (Value Proposition, mit CTA)", role: "attention", required: true, defaultCategories: ["hero", "hero-creative"] },
-  { id: "value-props",   label: "Leistungen & Angebote",   role: "value",      required: true,  defaultCategories: ["services", "content", "showcase"] },
+  { id: "hero",          label: "Hero (Value Proposition, mit CTA)", role: "attention", required: true, defaultCategories: ["hero", "hero-creative"], defaultIds: ["hero-proof", "hero-split"] },
+  { id: "value-props",   label: "Leistungen & Angebote",   role: "value",      required: true,  defaultCategories: ["services", "content", "showcase"], defaultIds: ["feature-grid", "services-zigzag"] },
   { id: "showcase",      label: "Produkt-Showcase",        role: "value",      required: false, defaultCategories: ["showcase", "gallery-creative", "bento", "commerce", "media"] },
   { id: "trust-strip",   label: "Trust-Streifen / Kennzahlen", role: "trust",  required: false, defaultCategories: ["social-proof", "content"] },
   { id: "audience",      label: "Zielgruppenansprache",    role: "value",      required: false, defaultCategories: ["content", "about"] },
   { id: "problem",       label: "Problem / Story",         role: "value",      required: false, defaultCategories: ["content", "about", "story-scroll"] },
-  { id: "about",         label: "About / Kurzvorstellung", role: "value",      required: false, defaultCategories: ["about", "content"] },
-  { id: "benefits",      label: "Vorteile / Nutzen",       role: "value",      required: true,  defaultCategories: ["benefits", "content"] },
-  { id: "process",       label: "Ablauf / Prozess",        role: "value",      required: false, defaultCategories: ["content", "engagement"] },
+  { id: "about",         label: "About / Kurzvorstellung", role: "value",      required: true,  defaultCategories: ["about", "content"], defaultIds: ["about-story"] },
+  { id: "benefits",      label: "Vorteile / Nutzen",       role: "value",      required: true,  defaultCategories: ["benefits", "content"], defaultIds: ["benefits-highlights"] },
+  { id: "process",       label: "Ablauf / Prozess",        role: "value",      required: true,  defaultCategories: ["content", "engagement"], defaultIds: ["process-steps"] },
   { id: "engagement",    label: "Interaktion",             role: "value",      required: false, defaultCategories: ["engagement", "interactive-creative"] },
   { id: "social-proof",  label: "Case Studies / Testimonials", role: "proof",  required: false, defaultCategories: ["social-proof", "social-creative"] },
   { id: "urgency",       label: "Dringlichkeit",           role: "conversion", required: false, defaultCategories: ["urgency"] },
-  { id: "final-cta",     label: "Call-to-Action",          role: "conversion", required: true,  defaultCategories: ["cta"] },
+  { id: "final-cta",     label: "Call-to-Action",          role: "conversion", required: true,  defaultCategories: ["cta"], defaultIds: ["dual-cta"] },
   { id: "blog",          label: "Blog / Ressourcen",       role: "proof",      required: false, defaultCategories: ["content", "editorial"] },
-  { id: "objection",     label: "FAQ (Einwände)",          role: "proof",      required: false, defaultCategories: ["content"] },
-  { id: "contact",       label: "Kontaktformular",         role: "conversion", required: false, defaultCategories: ["contact"] },
+  { id: "objection",     label: "FAQ (Einwände)",          role: "proof",      required: true,  defaultCategories: ["content"], defaultIds: ["faq-schema"] },
+  { id: "contact",       label: "Kontaktformular",         role: "conversion", required: true,  defaultCategories: ["contact"], defaultIds: ["contact-form"] },
   { id: "trust",         label: "Trust-Signale (Abschluss)", role: "close",    required: false, defaultCategories: ["trust"] },
-  { id: "footer",        label: "Footer",                  role: "structure",  required: true,  defaultCategories: ["structure", "footer-creative"] },
+  { id: "footer",        label: "Footer",                  role: "structure",  required: true,  defaultCategories: ["structure", "footer-creative"], defaultIds: ["footer"] },
 ];
 
 export function getConversionSlot(id: ConversionSlotId): ConversionSlot {
@@ -152,6 +166,10 @@ const STRUCTURE_NAV: SlotConfig = { ids: ["navbar-offcanvas"] };
 const STRUCTURE_FOOTER: SlotConfig = { ids: ["footer"] };
 const CREATIVE_NAV: SlotConfig = ["nav-creative"];
 const CREATIVE_FOOTER: SlotConfig = ["footer-creative"];
+// Kennzahlen-Streifen (Trust). Einzige Standard-Komponente, die auf den
+// trust-strip-Slot abbildet – daher als feste ID, damit sie nicht mit dem
+// Social-Proof-Slot kollidiert.
+const STATS_STRIP: SlotConfig = { ids: ["stats-showcase"] };
 
 export const MIXER_TEMPLATES: MixerTemplate[] = [
   {
@@ -163,17 +181,11 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
     slots: {
       nav: STRUCTURE_NAV,
       hero: ["hero"],
-      "value-props": ["services", "content"],
-      "trust-strip": ["content", "social-proof"],
-      audience: ["content", "about"],
-      about: ["about", "content"],
-      benefits: ["benefits", "content"],
-      process: ["content", "engagement"],
+      "value-props": ["services"],
+      "trust-strip": STATS_STRIP,
+      problem: ["content"],
       "social-proof": ["social-proof"],
-      "final-cta": ["cta"],
-      blog: ["content", "editorial"],
-      objection: ["content"],
-      contact: ["contact"],
+      blog: { ids: ["blog-teasers"] },
       footer: STRUCTURE_FOOTER,
     },
   },
@@ -187,11 +199,8 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
       hero: true,
       "value-props": ["content", "services"],
       problem: ["content"],
-      benefits: ["benefits", "content"],
-      process: ["content"],
       "social-proof": true,
       "final-cta": true,
-      objection: ["content"],
       contact: true,
       footer: STRUCTURE_FOOTER,
     },
@@ -199,19 +208,16 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
   {
     id: "saas",
     name: "SaaS-Website",
-    description: "Produktfokussiert mit Features, Showcase, Pricing und FAQ.",
+    description: "Produktfokussiert mit Features, Showcase und FAQ.",
     styleId: "22-feature-rich-showcase",
     slots: {
       nav: STRUCTURE_NAV,
       hero: true,
       "value-props": ["content", "services"],
       showcase: ["showcase"],
-      "trust-strip": ["social-proof"],
-      benefits: ["benefits", "content"],
-      engagement: true,
+      "trust-strip": STATS_STRIP,
       "social-proof": true,
       "final-cta": true,
-      objection: ["content"],
       footer: STRUCTURE_FOOTER,
     },
   },
@@ -223,7 +229,6 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
     slots: {
       nav: CREATIVE_NAV,
       hero: ["hero-creative"],
-      problem: ["typography-art"],
       "value-props": ["services"],
       showcase: ["gallery-creative"],
       "social-proof": true,
@@ -240,8 +245,9 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
       nav: CREATIVE_NAV,
       hero: ["hero-creative"],
       showcase: ["bento", "gallery-creative"],
-      "value-props": ["cards-creative", "editorial"],
+      "value-props": ["cards-creative"],
       "social-proof": ["social-proof"],
+      blog: ["editorial"],
       "final-cta": ["cta"],
       footer: CREATIVE_FOOTER,
     },
@@ -255,7 +261,7 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
       nav: STRUCTURE_NAV,
       announcement: ["hero"],
       hero: true,
-      "trust-strip": ["social-proof"],
+      "trust-strip": STATS_STRIP,
       showcase: ["commerce"],
       "social-proof": true,
       urgency: true,
@@ -272,7 +278,6 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
     slots: {
       nav: STRUCTURE_NAV,
       hero: true,
-      problem: ["about"],
       "value-props": ["services"],
       "social-proof": true,
       trust: true,
@@ -289,11 +294,11 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
     slots: {
       nav: STRUCTURE_NAV,
       hero: ["fintech"],
-      "trust-strip": ["social-proof"],
       "value-props": ["fintech"],
+      "trust-strip": ["fintech"],
       showcase: ["fintech"],
-      "social-proof": true,
-      trust: true,
+      "social-proof": ["fintech"],
+      trust: ["fintech"],
       "final-cta": true,
       footer: STRUCTURE_FOOTER,
     },
@@ -307,7 +312,9 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
       nav: STRUCTURE_NAV,
       hero: ["industrial-b2b"],
       "value-props": ["industrial-b2b"],
+      "trust-strip": ["industrial-b2b"],
       showcase: ["industrial-b2b"],
+      process: ["industrial-b2b"],
       "social-proof": ["industrial-b2b", "social-proof"],
       trust: true,
       "final-cta": true,
@@ -323,10 +330,13 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
     slots: {
       nav: CREATIVE_NAV,
       hero: ["story-scroll"],
+      "value-props": ["services"],
       problem: ["story-scroll"],
+      about: ["story-scroll"],
       showcase: ["story-scroll", "gallery-creative"],
       "social-proof": true,
-      "final-cta": true,
+      "final-cta": ["story-scroll"],
+      blog: ["story-scroll"],
       footer: CREATIVE_FOOTER,
     },
   },
@@ -340,10 +350,11 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
       hero: ["technical-spec"],
       "value-props": ["technical-spec"],
       showcase: ["technical-spec"],
-      "social-proof": ["social-proof"],
-      objection: ["content"],
-      trust: true,
+      process: ["technical-spec"],
+      "social-proof": ["technical-spec", "social-proof"],
+      trust: ["technical-spec"],
       "final-cta": true,
+      contact: true,
       footer: STRUCTURE_FOOTER,
     },
   },
@@ -388,6 +399,19 @@ function pickRandom<T>(items: T[]): T | undefined {
   return items[Math.floor(Math.random() * items.length)];
 }
 
+/**
+ * Standard-Belegung eines Slots, wenn das Template ihn nicht überschreibt.
+ * Backbone-Slots mit kuratierten `defaultIds` werden damit garantiert von der
+ * passenden Komponente belegt (Ablauf → process-steps, FAQ → faq-schema …),
+ * statt aus einer breiten Sammelkategorie zufällig zu ziehen.
+ */
+function slotDefaultCandidates(slot: ConversionSlot): string[] | { ids: string[] } {
+  if (slot.defaultIds && slot.defaultIds.length > 0) return { ids: slot.defaultIds };
+  return slot.defaultCategories.flatMap((c) =>
+    getComponentsByCategory(c).map((comp) => comp.id),
+  );
+}
+
 function resolveSlotCandidates(
   slot: ConversionSlot,
   config: SlotConfig | undefined,
@@ -397,9 +421,7 @@ function resolveSlotCandidates(
   // Slot nicht im Template genannt: nur required-Slots werden dann default-aktiv
   if (config === undefined) {
     if (!slot.required) return null;
-    return slot.defaultCategories.flatMap((c) =>
-      getComponentsByCategory(c).map((comp) => comp.id),
-    );
+    return slotDefaultCandidates(slot);
   }
   if (config === true) {
     return slot.defaultCategories.flatMap((c) =>
@@ -485,25 +507,37 @@ export function mixPageDetailed(template: MixerTemplate): MixedSlot[] {
     let candidates = resolveSlotCandidates(slot, config);
 
     // ── Auto-Fill ───────────────────────────────────────────────
-    // Wenn ein required-Slot vom Template nicht gesetzt ist, fallen wir
-    // auf die Default-Kategorien zurück, damit die Grundstruktur (Hero,
-    // Value-Props, Social-Proof, Final-CTA, Nav, Footer) immer vorhanden
-    // ist. Playbook-Regel: Trust, CTA-Wiederholung, Formular-Länge.
+    // Wenn ein required-Slot vom Template nicht (oder als `true`) gesetzt ist,
+    // fällt er auf seine kuratierte Standard-Belegung zurück. So enthält JEDE
+    // Generation das komplette Backbone (Nav → Hero → Leistungen → About →
+    // Vorteile → Ablauf → CTA → FAQ → Kontakt → Footer) mit der jeweils
+    // passenden Komponente – nur die optische Ausgestaltung variiert.
     if (candidates === null && slot.required) {
-      candidates = slot.defaultCategories.flatMap((c) =>
-        getComponentsByCategory(c).map((comp) => comp.id),
-      );
+      candidates = slotDefaultCandidates(slot);
     }
     if (candidates === null) continue;
 
-    let chosen: string | undefined;
-    if (Array.isArray(candidates)) {
-      const fresh = candidates.filter((id) => !used.has(id));
-      chosen = pickRandom(fresh) ?? pickRandom(candidates);
-    } else {
-      const fresh = candidates.ids.filter((id) => !used.has(id));
-      chosen = pickRandom(fresh) ?? pickRandom(candidates.ids);
+    const candidateIds = Array.isArray(candidates) ? candidates : candidates.ids;
+
+    // ── Slot-Treue erzwingen ────────────────────────────────────
+    // Die Vorschau leitet den Slot jeder Komponente aus ihrer ID ab
+    // (resolveSlotForId). Damit die Auswahl des Mixers dort auch wirklich in
+    // DIESEM Slot landet, ziehen wir bevorzugt Kandidaten, die auf den Slot
+    // abbilden. So kann z. B. ein thematischer Fintech-Hero nicht als
+    // Leistungs-Sektion enden und zwei Slots kollidieren nicht.
+    let pool = candidateIds.filter((id) => resolveSlotForId(id) === slot.id);
+    if (pool.length === 0 && slot.required) {
+      // Thematische Kandidaten passen nicht auf den Slot → kuratierten
+      // Standard nehmen, damit das Backbone garantiert vollständig bleibt.
+      const fallback = slotDefaultCandidates(slot);
+      const fallbackIds = Array.isArray(fallback) ? fallback : fallback.ids;
+      pool = fallbackIds.filter((id) => resolveSlotForId(id) === slot.id);
+      if (pool.length === 0) pool = fallbackIds;
     }
+    if (pool.length === 0) pool = candidateIds;
+
+    const fresh = pool.filter((id) => !used.has(id));
+    const chosen = pickRandom(fresh) ?? pickRandom(pool);
     if (!chosen) continue;
     used.add(chosen);
     picks.push({ slot, componentId: chosen });
@@ -612,15 +646,27 @@ const CATEGORY_TO_SLOT: Partial<Record<string, ConversionSlotId>> = {
 // die Komponenten-ID einem konkreten Slot eindeutig zuzuordnen ist (z. B.
 // FAQ → objection, Prozess-Schritte → process, Blog-Teaser → blog).
 const ID_TO_SLOT: Array<{ pattern: RegExp; slotId: ConversionSlotId }> = [
+  // Heroes zuerst — jede Komponente mit "hero" im Namen ist ein Hero,
+  // egal aus welcher (auch thematischer) Kategorie sie stammt.
+  { pattern: /hero/, slotId: "hero" },
   { pattern: /^faq/, slotId: "objection" },
-  { pattern: /^blog/, slotId: "blog" },
-  { pattern: /process-steps|quiz-funnel|progress-form/, slotId: "process" },
-  { pattern: /^about|team-showcase|timeline|awards/, slotId: "about" },
+  { pattern: /^blog|journal-teasers/, slotId: "blog" },
+  { pattern: /process-steps|quiz-funnel|progress-form|process-line|diagram-flow/, slotId: "process" },
+  { pattern: /^about|team-showcase|timeline|awards|heritage-statement/, slotId: "about" },
   { pattern: /^benefit|advantage/, slotId: "benefits" },
   { pattern: /^contact/, slotId: "contact" },
-  { pattern: /pas-narrative/, slotId: "audience" },
+  { pattern: /pas-narrative|chapter-stack/, slotId: "problem" },
   { pattern: /pricing|comparison|roi-calculator/, slotId: "benefits" },
   { pattern: /countdown|limited-availability|exit-intent|abandonment/, slotId: "urgency" },
+  // Site-Inspirationen (fintech / industrial-b2b / story-scroll / technical-spec)
+  // auf die passenden Backbone- bzw. Ergänzungs-Slots abbilden, damit sie in
+  // der Vorschau an der richtigen Stelle landen statt in der Kategorie-Default.
+  { pattern: /mega-stats|metric-proof|stats-showcase/, slotId: "trust-strip" },
+  { pattern: /rate-cards|capability-grid|service-index|product-grid/, slotId: "value-props" },
+  { pattern: /glass-dashboard|growth-chart|sector-grid|model-showcase|spec-table/, slotId: "showcase" },
+  { pattern: /partner-metrics|partner-band|logo-wall/, slotId: "social-proof" },
+  { pattern: /security-bar|cert-band/, slotId: "trust" },
+  { pattern: /vanguard-cta|cta-solution/, slotId: "final-cta" },
 ];
 
 export interface RhythmAssignment {
