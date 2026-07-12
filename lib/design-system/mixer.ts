@@ -380,10 +380,59 @@ function resolveSlotCandidates(
   return { ids: config.ids };
 }
 
+// ── Section-Rhythm ──────────────────────────────────────────────────────
+// Jede Sektion bekommt ein "Skin": bg, surface oder tint. Der Wrapper der
+// Live-Preview / des HTML-Exports setzt daraus die Hintergrundfarbe, sodass
+// zwei benachbarte Sektionen sich immer visuell unterscheiden.
+
+export type SectionSkin = "bg" | "surface" | "tint" | "inverse";
+
+/** Kompakte, harte Sektionen (Padding-Modifikator "sm"). */
+const COMPACT_ROLES = new Set<ConversionSlot["role"]>(["structure"]);
+/** Aufmerksamkeits-Sektionen — Hero, Final-CTA — brauchen mehr Luft. */
+const LARGE_SLOTS = new Set<ConversionSlotId>(["hero", "final-cta"]);
+/** Slots, die vom Rhythmus ausgenommen sind (Nav / Footer haben ihr eigenes Chrome). */
+const NO_RHYTHM_SLOTS = new Set<ConversionSlotId>(["nav", "footer", "announcement"]);
+
 export interface MixedSlot {
   slotId: ConversionSlotId;
   slotLabel: string;
   componentId: string;
+  /** Vom Mixer zugewiesenes Hintergrund-Skin (Auto-Alternation). */
+  skin: SectionSkin;
+  /** Padding-Modifikator: "sm" | "md" | "lg" — steuert clamp-Höhe der Sektion. */
+  padding: "sm" | "md" | "lg";
+}
+
+/**
+ * Weist jedem Slot ein Skin zu, sodass zwei benachbarte Sektionen sich immer
+ * unterscheiden. Regeln:
+ *  - Hero-Slot startet auf "bg" (klar, hell).
+ *  - Danach wechselt es zwischen "bg" und "surface", damit jede Sektion
+ *    optisch abgesetzt wird.
+ *  - Trust/Fördermechanik-Sektionen und Final-CTA bekommen "tint" (Primary-
+ *    lasiert), damit sie als Akzent hervorstechen.
+ *  - Nav und Footer sind vom Rhythmus ausgenommen (bekommen "bg" default).
+ */
+function assignSkin(
+  slot: ConversionSlot,
+  index: number,
+  previousSkin: SectionSkin | undefined,
+): SectionSkin {
+  if (NO_RHYTHM_SLOTS.has(slot.id)) return "bg";
+  // Akzent-Sektionen
+  if (slot.id === "trust" || slot.id === "final-cta") return "tint";
+  // Alternation: bevorzugt gegenteilig zum vorherigen Skin.
+  if (previousSkin === "surface" || previousSkin === "tint") return "bg";
+  if (previousSkin === "bg") return "surface";
+  return index % 2 === 0 ? "bg" : "surface";
+}
+
+function assignPadding(slot: ConversionSlot): "sm" | "md" | "lg" {
+  if (LARGE_SLOTS.has(slot.id)) return "lg";
+  if (COMPACT_ROLES.has(slot.role) || slot.id === "trust-strip" || slot.id === "announcement")
+    return "sm";
+  return "md";
 }
 
 /**
@@ -394,11 +443,22 @@ export interface MixedSlot {
  */
 export function mixPageDetailed(template: MixerTemplate): MixedSlot[] {
   const used = new Set<string>();
-  const result: MixedSlot[] = [];
+  const picks: Array<{ slot: ConversionSlot; componentId: string }> = [];
 
   for (const slot of CONVERSION_FRAME) {
     const config = template.slots[slot.id];
-    const candidates = resolveSlotCandidates(slot, config);
+    let candidates = resolveSlotCandidates(slot, config);
+
+    // ── Auto-Fill ───────────────────────────────────────────────
+    // Wenn ein required-Slot vom Template nicht gesetzt ist, fallen wir
+    // auf die Default-Kategorien zurück, damit die Grundstruktur (Hero,
+    // Value-Props, Social-Proof, Final-CTA, Nav, Footer) immer vorhanden
+    // ist. Playbook-Regel: Trust, CTA-Wiederholung, Formular-Länge.
+    if (candidates === null && slot.required) {
+      candidates = slot.defaultCategories.flatMap((c) =>
+        getComponentsByCategory(c).map((comp) => comp.id),
+      );
+    }
     if (candidates === null) continue;
 
     let chosen: string | undefined;
@@ -411,15 +471,150 @@ export function mixPageDetailed(template: MixerTemplate): MixedSlot[] {
     }
     if (!chosen) continue;
     used.add(chosen);
-    result.push({ slotId: slot.id, slotLabel: slot.label, componentId: chosen });
+    picks.push({ slot, componentId: chosen });
   }
 
+  // ── Playbook-Ergänzungen ───────────────────────────────────────
+  // 1) CTA-Hierarchie: mind. CTA_MIN_OCCURRENCES CTA-Sektionen. Wenn zu
+  //    wenige, ergänzen wir eine cta-Komponente vor dem Footer.
+  const ctaCount = picks.filter(
+    (p) => p.slot.role === "conversion" || p.slot.id === "final-cta",
+  ).length;
+  if (ctaCount < CTA_MIN_OCCURRENCES) {
+    const finalCtaSlot = getConversionSlot("final-cta");
+    if (!picks.some((p) => p.slot.id === "final-cta")) {
+      const candidate = getComponentsByCategory("cta").find((c) => !used.has(c.id));
+      if (candidate) {
+        used.add(candidate.id);
+        // Vor "footer" einfügen
+        const footerIdx = picks.findIndex((p) => p.slot.id === "footer");
+        const insertAt = footerIdx >= 0 ? footerIdx : picks.length;
+        picks.splice(insertAt, 0, { slot: finalCtaSlot, componentId: candidate.id });
+      }
+    }
+  }
+  // 2) Trust: mindestens eine Trust- oder Social-Proof-Sektion.
+  const hasTrust = picks.some(
+    (p) => p.slot.id === "trust" || p.slot.id === "social-proof" || p.slot.id === "trust-strip",
+  );
+  if (!hasTrust) {
+    const trustSlot = getConversionSlot("social-proof");
+    const candidate = getComponentsByCategory("social-proof").find((c) => !used.has(c.id));
+    if (candidate) {
+      used.add(candidate.id);
+      const finalCtaIdx = picks.findIndex((p) => p.slot.id === "final-cta");
+      const insertAt = finalCtaIdx >= 0 ? finalCtaIdx : Math.max(0, picks.length - 1);
+      picks.splice(insertAt, 0, { slot: trustSlot, componentId: candidate.id });
+    }
+  }
+
+  // ── Rhythm + Padding zuweisen ─────────────────────────────────
+  const result: MixedSlot[] = [];
+  let prevSkin: SectionSkin | undefined;
+  picks.forEach(({ slot, componentId }, i) => {
+    const skin = assignSkin(slot, i, prevSkin);
+    result.push({
+      slotId: slot.id,
+      slotLabel: slot.label,
+      componentId,
+      skin,
+      padding: assignPadding(slot),
+    });
+    if (!NO_RHYTHM_SLOTS.has(slot.id)) prevSkin = skin;
+  });
   return result;
 }
 
 /** Rückgabe-kompatible Liste von IDs – für bestehende Aufrufer. */
 export function mixPage(template: MixerTemplate): string[] {
   return mixPageDetailed(template).map((m) => m.componentId);
+}
+
+// ── Rhythm-Inferenz aus reinen Komponenten-IDs ─────────────────────────
+// Der Component-Store speichert nur IDs (ohne Slot-Kontext). Damit die
+// Live-Preview trotzdem den Auto-Alternation-Rhythm anwenden kann, mappen
+// wir Kategorie → wahrscheinlichster Slot und leiten das Skin daraus ab.
+
+const CATEGORY_TO_SLOT: Partial<Record<string, ConversionSlotId>> = {
+  structure: "nav", // Wird gleich unten nach Komponenten-ID differenziert
+  hero: "hero",
+  "hero-creative": "hero",
+  "typography-art": "hero",
+  about: "problem",
+  services: "value-props",
+  "social-proof": "social-proof",
+  "social-creative": "social-proof",
+  media: "showcase",
+  cta: "final-cta",
+  pricing: "pricing",
+  engagement: "engagement",
+  urgency: "urgency",
+  content: "value-props",
+  contact: "contact",
+  recovery: "urgency",
+  trust: "trust",
+  bento: "showcase",
+  "cards-creative": "value-props",
+  "gallery-creative": "showcase",
+  showcase: "showcase",
+  "footer-creative": "footer",
+  "nav-creative": "nav",
+  commerce: "showcase",
+  editorial: "value-props",
+  decor: "value-props",
+  "interactive-creative": "engagement",
+  "scroll-motion": "showcase",
+  fintech: "value-props",
+  "industrial-b2b": "value-props",
+  "story-scroll": "problem",
+  "technical-spec": "value-props",
+};
+
+export interface RhythmAssignment {
+  componentId: string;
+  slotId: ConversionSlotId;
+  skin: SectionSkin;
+  padding: "sm" | "md" | "lg";
+}
+
+/**
+ * Leitet für eine Liste von Komponenten-IDs Skin + Padding ab. Wird von der
+ * Live-Preview genutzt, damit auch manuell zusammengestellte Seiten den
+ * Auto-Alternation-Rhythm bekommen.
+ */
+export function assignRhythmForIds(ids: string[]): RhythmAssignment[] {
+  const result: RhythmAssignment[] = [];
+  let prevSkin: SectionSkin | undefined;
+  ids.forEach((id, i) => {
+    const comp = getComponentById(id);
+    if (!comp) return;
+    // Footer- / Nav-Sonderfälle: unabhängig von Kategorie erkennen.
+    let slotId: ConversionSlotId;
+    if (/(^|-)footer($|-)/.test(comp.id)) slotId = "footer";
+    else if (/^nav|-nav($|-)|navbar/.test(comp.id)) slotId = "nav";
+    else if (comp.id === "announcement-bar") slotId = "announcement";
+    else slotId = CATEGORY_TO_SLOT[comp.category] ?? "value-props";
+    const slot = CONVERSION_FRAME.find((s) => s.id === slotId) ?? getConversionSlot("value-props");
+    const skin = assignSkin(slot, i, prevSkin);
+    result.push({
+      componentId: id,
+      slotId,
+      skin,
+      padding: assignPadding(slot),
+    });
+    if (!NO_RHYTHM_SLOTS.has(slot.id)) prevSkin = skin;
+  });
+  return result;
+}
+
+/** CSS-Klasse für ein Skin (Wrapper). */
+export function skinClass(skin: SectionSkin): string {
+  return `ds-rhythm ds-rhythm-${skin}`;
+}
+
+/** CSS-Klasse für die Padding-Stufe (auf .ds-section anwenden). */
+export function paddingClass(padding: "sm" | "md" | "lg"): string {
+  return padding === "md" ? "" : `ds-sec-${padding}`;
 }
 
 // ── Playbook-Check ──────────────────────────────────────────────────────
