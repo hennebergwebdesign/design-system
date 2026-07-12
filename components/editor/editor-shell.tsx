@@ -143,7 +143,7 @@ export function EditorShell({
           {renderPanel(section)}
         </div>
         <div className="min-w-0 flex-1 bg-muted/20">
-          <LivePreview system={project.system} section={section} />
+          <LivePreview system={project.system} section={section} projectId={projectId} />
         </div>
       </div>
     </div>

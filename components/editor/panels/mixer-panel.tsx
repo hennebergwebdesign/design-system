@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Check, CircleAlert, CircleCheck, Info, Layers, Shuffle, Palette } from "lucide-react";
 import { PanelShell, PanelGroup } from "./panel-shell";
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,13 @@ import { getComponentById } from "@/lib/design-system/conversion-components";
 import { useDesignStore, useDesignSystem } from "@/lib/store/design-store";
 import { styleToEffects } from "@/lib/design-system/knowledge/adapters";
 import {
+  CONVERSION_FRAME,
   MIXER_TEMPLATES,
-  mixPage,
+  mixPageDetailed,
   evaluateMix,
   getMixerTemplateStyle,
+  type ConversionSlotId,
+  type MixedSlot,
   type MixerTemplate,
   type MixCheckItem,
 } from "@/lib/design-system/mixer";
@@ -36,11 +39,13 @@ export function MixerPanel() {
   const update = useDesignStore((s) => s.update);
   const system = useDesignSystem();
   const [activeTemplate, setActiveTemplate] = useState<MixerTemplate | null>(null);
+  const [lastMix, setLastMix] = useState<MixedSlot[]>([]);
   const [justMixed, setJustMixed] = useState(false);
 
   function mix(template: MixerTemplate) {
-    const ids = mixPage(template);
-    setSelection(ids);
+    const detailed = mixPageDetailed(template);
+    setSelection(detailed.map((d) => d.componentId));
+    setLastMix(detailed);
     const style = getMixerTemplateStyle(template);
     if (style) {
       const effects = styleToEffects(style);
@@ -61,7 +66,7 @@ export function MixerPanel() {
   return (
     <PanelShell
       title="Komponenten-Mixer"
-      description="Wählen Sie einen Seitentyp – der Mixer stellt sofort eine passende, vollständige Seite aus dem Komponenten-Katalog zusammen und wendet einen dazu passenden Stil aus der Design-Wissensdatenbank an."
+      description="Jede Seite folgt derselben Conversion-Struktur – Nav → Hero → Trust → Nutzen → Beweis → CTA → Kontakt → Footer. Je nach Seitentyp werden einzelne Slots ergänzt oder ausgelassen, die Grundstruktur bleibt immer erhalten."
     >
       <PanelGroup label="Seitentyp">
         <div className="space-y-2">
@@ -92,11 +97,7 @@ export function MixerPanel() {
 
       {activeTemplate && (
         <PanelGroup label="Ergebnis">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => mix(activeTemplate)}
-          >
+          <Button variant="outline" className="w-full" onClick={() => mix(activeTemplate)}>
             <Shuffle className="size-3.5" />
             Neu mischen
           </Button>
@@ -109,7 +110,7 @@ export function MixerPanel() {
               </p>
             </div>
           )}
-          <MixedList selectedIds={selectedIds} />
+          <ConversionStructureList mix={lastMix} template={activeTemplate} />
         </PanelGroup>
       )}
 
@@ -135,19 +136,73 @@ export function MixerPanel() {
   );
 }
 
-function MixedList({ selectedIds }: { selectedIds: string[] }) {
-  if (selectedIds.length === 0) return null;
+const ROLE_COLOR: Record<string, string> = {
+  structure: "bg-slate-400",
+  attention: "bg-amber-500",
+  trust: "bg-sky-500",
+  value: "bg-emerald-500",
+  proof: "bg-violet-500",
+  conversion: "bg-rose-500",
+  close: "bg-slate-500",
+};
+
+function ConversionStructureList({
+  mix,
+  template,
+}: {
+  mix: MixedSlot[];
+  template: MixerTemplate;
+}) {
+  const bySlot = useMemo(() => {
+    const m = new Map<ConversionSlotId, MixedSlot>();
+    for (const item of mix) m.set(item.slotId, item);
+    return m;
+  }, [mix]);
+
   return (
     <div className="space-y-1">
-      {selectedIds.map((id, index) => {
-        const comp = getComponentById(id);
-        if (!comp) return null;
+      {CONVERSION_FRAME.map((slot, index) => {
+        const filled = bySlot.get(slot.id);
+        const comp = filled ? getComponentById(filled.componentId) : null;
+        const isSkipped = !filled;
+        const explicitlyOff = template.slots[slot.id] === false;
+
         return (
           <div
-            key={`${id}-${index}`}
-            className="rounded-lg border bg-background px-2.5 py-1.5 text-sm"
+            key={slot.id}
+            className={cn(
+              "flex items-start gap-2 rounded-lg border px-2.5 py-1.5",
+              isSkipped && "border-dashed bg-muted/30 opacity-60",
+            )}
           >
-            <span className="font-medium">{comp.name}</span>
+            <span className="mt-1.5 text-[10px] tabular-nums text-muted-foreground w-4 shrink-0">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <span
+              className={cn("mt-1.5 size-1.5 shrink-0 rounded-full", ROLE_COLOR[slot.role])}
+              aria-hidden
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-medium leading-tight">
+                {slot.label}
+                {slot.required && (
+                  <span className="ml-1 text-[9px] uppercase tracking-wide text-muted-foreground">
+                    Pflicht
+                  </span>
+                )}
+              </p>
+              {comp ? (
+                <p className="text-[11px] text-muted-foreground truncate">{comp.name}</p>
+              ) : (
+                <p className="text-[10px] italic text-muted-foreground">
+                  {explicitlyOff
+                    ? "vom Seitentyp ausgelassen"
+                    : slot.required
+                      ? "wird aufgefüllt"
+                      : "optional – für diesen Seitentyp nicht benötigt"}
+                </p>
+              )}
+            </div>
           </div>
         );
       })}
