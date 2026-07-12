@@ -10,6 +10,7 @@ export type ConversionCategory =
   | "hero"
   | "about"
   | "services"
+  | "benefits"
   | "social-proof"
   | "media"
   | "cta"
@@ -60,6 +61,10 @@ export const CATEGORY_META: Record<
   services: {
     label: "Leistungen",
     description: "Leistungsübersichten und Detail-Layouts",
+  },
+  benefits: {
+    label: "Vorteile & Nutzen",
+    description: "Was der Kunde davon hat – Nutzen-Argumente statt Feature-Listen",
   },
   media: {
     label: "Galerie & Medien",
@@ -188,6 +193,7 @@ export const CATEGORIES_ORDERED: ConversionCategory[] = [
   "technical-spec",
   "about",
   "services",
+  "benefits",
   "showcase",
   "commerce",
   "social-proof",
@@ -886,6 +892,58 @@ const BASE_COMPONENTS: ConversionComponentDef[] = [
       { key: "count", label: "Anzahl Leistungen", type: "number", default: 3 },
       { key: "ctaText", label: "CTA je Block", type: "text", default: "Mehr erfahren" },
     ],
+  },
+
+  // ── Vorteile & Nutzen ──────────────────────────────────────
+  {
+    id: "benefits-highlights",
+    category: "benefits",
+    name: "Vorteile / Nutzen-Highlights",
+    description:
+      "Raster aus Vorteilen mit Häkchen-Icon, Titel und Nutzenbeschreibung – beantwortet 'Was habe ich davon?'.",
+    conversionTip:
+      "Vorteile (Was habe ich davon?) überzeugen stärker als reine Leistungen (Was ist es?). Ein klarer Nutzen-Block direkt nach den Leistungen hebt die wahrgenommene Relevanz.",
+    slots: [
+      { key: "eyebrow", label: "Eyebrow", type: "text", default: "Ihre Vorteile" },
+      { key: "headline", label: "Überschrift", type: "text", default: "Darum lohnt sich die Zusammenarbeit" },
+      { key: "subline", label: "Subline", type: "text", default: "Konkrete Vorteile, die für Sie den entscheidenden Unterschied machen." },
+      { key: "b1title", label: "Vorteil 1 – Titel", type: "text", default: "Schneller zum Ergebnis" },
+      { key: "b1text", label: "Vorteil 1 – Text", type: "text", default: "Klare Abläufe und feste Ansprechpartner sparen Ihnen Zeit und Nerven." },
+      { key: "b2title", label: "Vorteil 2 – Titel", type: "text", default: "Planbare Kosten" },
+      { key: "b2text", label: "Vorteil 2 – Text", type: "text", default: "Transparente Pakete ohne versteckte Positionen – Sie wissen immer, woran Sie sind." },
+      { key: "b3title", label: "Vorteil 3 – Titel", type: "text", default: "Persönliche Betreuung" },
+      { key: "b3text", label: "Vorteil 3 – Text", type: "text", default: "Sie sprechen mit echten Menschen statt mit einem anonymen Callcenter." },
+      { key: "b4title", label: "Vorteil 4 – Titel", type: "text", default: "Nachweisbare Ergebnisse" },
+      { key: "b4text", label: "Vorteil 4 – Text", type: "text", default: "Wir arbeiten messbar – Fortschritt und Erfolg bleiben jederzeit sichtbar." },
+    ],
+    render: ({ s, open, close }) => {
+      const items: Array<[string, string]> = [
+        [s("b1title"), s("b1text")],
+        [s("b2title"), s("b2text")],
+        [s("b3title"), s("b3text")],
+        [s("b4title"), s("b4text")],
+      ];
+      const cards = items
+        .filter(([title]) => title)
+        .map(
+          ([title, text]) => `<div class="ds-benefit-card">
+        <span class="ds-benefit-check" aria-hidden="true">✓</span>
+        <div>
+          <h3 class="ds-benefit-title">${title}</h3>
+          <p class="ds-body ds-muted">${text}</p>
+        </div>
+      </div>`,
+        )
+        .join("");
+      return `${open()}
+  <div class="ds-container ds-text-center">
+    <span class="ds-eyebrow">${s("eyebrow")}</span>
+    <h2 class="ds-h2">${s("headline")}</h2>
+    <p class="ds-body ds-muted" style="max-width:600px;margin:12px auto 0">${s("subline")}</p>
+    <div class="ds-benefit-grid">${cards}</div>
+  </div>
+${close}`;
+    },
   },
 
   // ── Galerie & Medien ───────────────────────────────────────

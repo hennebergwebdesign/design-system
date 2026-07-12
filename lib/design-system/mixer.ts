@@ -1,11 +1,21 @@
 // Komponenten-Mixer.
 //
 // Ziel: Jede vom Mixer erstellte Seite folgt derselben Conversion-Struktur –
-// einer festen Reihenfolge von Slots (Nav → Hero → Trust → Nutzen → Social
-// Proof → Einwände → CTA → Kontakt → Footer). Einzelne Slots können je nach
-// Projektart ergänzt oder ausgelassen werden, aber die grobe Grundstruktur
-// bleibt bei jedem Seitentyp konsistent. Templates bestimmen nur, welche
-// Slots aktiv sind und aus welchen Katalog-Kategorien pro Slot gewählt wird.
+// einer festen Reihenfolge von Slots:
+//   Nav → Hero → Leistungen → Problem/About → Vorteile → Ablauf → CTA →
+//   (Blog) → FAQ → Kontakt → Footer.
+// Verbindliche Regeln dieser Reihenfolge:
+//   • Nav und Hero enthalten immer einen CTA.
+//   • Die Leistungen (services) folgen IMMER direkt auf den Hero — keine
+//     Trust-/Zwischen-Sektion drängt sich dazwischen.
+//   • Danach kommt eine Problembeschreibung / kurze Vorstellung (About),
+//     anschließend die Vorteile (benefits) und der Ablauf (process).
+//   • Der Blog erscheint ausschließlich oberhalb der FAQ oder gar nicht.
+//   • Pricing wird bewusst NICHT gemischt (relativ selten, auf Wunsch außen vor).
+// Einzelne Slots können je nach Projektart ergänzt oder ausgelassen werden,
+// aber die grobe Grundstruktur bleibt bei jedem Seitentyp konsistent.
+// Templates bestimmen nur, welche Slots aktiv sind und aus welchen
+// Katalog-Kategorien pro Slot gewählt wird.
 //
 // Skill-Integration: Jede Vorlage referenziert einen passenden Eintrag aus
 // der STYLE_LIBRARY (ui-ux-pro-max Skill), der beim Mischen automatisch als
@@ -42,21 +52,21 @@ export type ConversionSlotId =
   | "nav"
   | "announcement"
   | "hero"
+  | "value-props"
+  | "showcase"
   | "trust-strip"
   | "audience"
   | "problem"
-  | "value-props"
-  | "showcase"
+  | "about"
+  | "benefits"
   | "process"
   | "engagement"
-  | "about"
   | "social-proof"
-  | "blog"
-  | "pricing"
   | "urgency"
+  | "final-cta"
+  | "blog"
   | "objection"
   | "contact"
-  | "final-cta"
   | "trust"
   | "footer";
 
@@ -70,31 +80,36 @@ export interface ConversionSlot {
 }
 
 // Feste Section-Reihenfolge jeder Startseite. Regel (verbindlich):
-//   Hero → Trust → (Zielgruppenansprache) → Leistungen/Angebote → Ablauf (mit
-//   CTA) → About (Warum) → (Case Studies / Trust) → (Blog) → FAQ → Contact /
-//   Final-CTA → Footer.
-// FAQ (objection) steht IMMER unmittelbar vor Contact/Final-CTA. Blog steht
-// ausschließlich über der FAQ oder gar nicht. Pricing/Urgency/Announcement
-// bleiben als optionale Ergänzungs-Slots erhalten, folgen aber demselben Fluss.
+//   Nav → Hero → Leistungen → (Showcase) → (Kennzahlen) → (Zielgruppe) →
+//   Problem → About → Vorteile → Ablauf → (Interaktion) → (Case Studies) →
+//   (Dringlichkeit) → Final-CTA → (Blog) → FAQ → Kontakt → (Trust) → Footer.
+// Kernregeln:
+//   • Leistungen (value-props) folgen IMMER direkt auf den Hero.
+//   • Vorteile (benefits) stehen nach Problem/About und vor dem Ablauf.
+//   • FAQ (objection) steht IMMER unmittelbar vor dem Kontakt.
+//   • Blog steht ausschließlich über der FAQ oder gar nicht.
+//   • Pricing ist bewusst kein Mixer-Slot mehr (auf Wunsch nicht implementiert).
+// Urgency/Announcement/Trust bleiben optionale Ergänzungs-Slots, folgen aber
+// demselben Fluss.
 export const CONVERSION_FRAME: ConversionSlot[] = [
-  { id: "nav",           label: "Navigation",              role: "structure",  required: true,  defaultCategories: ["structure", "nav-creative"] },
+  { id: "nav",           label: "Navigation (mit CTA)",    role: "structure",  required: true,  defaultCategories: ["structure", "nav-creative"] },
   { id: "announcement",  label: "Ankündigungsleiste",      role: "attention",  required: false, defaultCategories: ["hero"] },
-  { id: "hero",          label: "Hero (Value Proposition)", role: "attention", required: true,  defaultCategories: ["hero", "hero-creative"] },
-  { id: "trust-strip",   label: "Trust-Streifen / Kennzahlen", role: "trust",  required: true,  defaultCategories: ["social-proof", "content"] },
-  { id: "audience",      label: "Zielgruppenansprache",    role: "value",      required: false, defaultCategories: ["content", "about"] },
-  { id: "problem",       label: "Problem / Story",         role: "value",      required: false, defaultCategories: ["content", "about", "story-scroll"] },
+  { id: "hero",          label: "Hero (Value Proposition, mit CTA)", role: "attention", required: true, defaultCategories: ["hero", "hero-creative"] },
   { id: "value-props",   label: "Leistungen & Angebote",   role: "value",      required: true,  defaultCategories: ["services", "content", "showcase"] },
   { id: "showcase",      label: "Produkt-Showcase",        role: "value",      required: false, defaultCategories: ["showcase", "gallery-creative", "bento", "commerce", "media"] },
+  { id: "trust-strip",   label: "Trust-Streifen / Kennzahlen", role: "trust",  required: false, defaultCategories: ["social-proof", "content"] },
+  { id: "audience",      label: "Zielgruppenansprache",    role: "value",      required: false, defaultCategories: ["content", "about"] },
+  { id: "problem",       label: "Problem / Story",         role: "value",      required: false, defaultCategories: ["content", "about", "story-scroll"] },
+  { id: "about",         label: "About / Kurzvorstellung", role: "value",      required: false, defaultCategories: ["about", "content"] },
+  { id: "benefits",      label: "Vorteile / Nutzen",       role: "value",      required: true,  defaultCategories: ["benefits", "content"] },
   { id: "process",       label: "Ablauf / Prozess",        role: "value",      required: false, defaultCategories: ["content", "engagement"] },
   { id: "engagement",    label: "Interaktion",             role: "value",      required: false, defaultCategories: ["engagement", "interactive-creative"] },
-  { id: "about",         label: "About (Warum wir)",       role: "value",      required: false, defaultCategories: ["about", "content"] },
-  { id: "social-proof",  label: "Case Studies / Testimonials", role: "proof",  required: true,  defaultCategories: ["social-proof", "social-creative"] },
-  { id: "blog",          label: "Blog / Ressourcen",       role: "proof",      required: false, defaultCategories: ["content", "editorial"] },
-  { id: "pricing",       label: "Pricing",                 role: "conversion", required: false, defaultCategories: ["pricing"] },
+  { id: "social-proof",  label: "Case Studies / Testimonials", role: "proof",  required: false, defaultCategories: ["social-proof", "social-creative"] },
   { id: "urgency",       label: "Dringlichkeit",           role: "conversion", required: false, defaultCategories: ["urgency"] },
+  { id: "final-cta",     label: "Call-to-Action",          role: "conversion", required: true,  defaultCategories: ["cta"] },
+  { id: "blog",          label: "Blog / Ressourcen",       role: "proof",      required: false, defaultCategories: ["content", "editorial"] },
   { id: "objection",     label: "FAQ (Einwände)",          role: "proof",      required: false, defaultCategories: ["content"] },
-  { id: "contact",       label: "Kontakt",                 role: "conversion", required: false, defaultCategories: ["contact"] },
-  { id: "final-cta",     label: "Finaler Call-to-Action",  role: "conversion", required: true,  defaultCategories: ["cta"] },
+  { id: "contact",       label: "Kontaktformular",         role: "conversion", required: false, defaultCategories: ["contact"] },
   { id: "trust",         label: "Trust-Signale (Abschluss)", role: "close",    required: false, defaultCategories: ["trust"] },
   { id: "footer",        label: "Footer",                  role: "structure",  required: true,  defaultCategories: ["structure", "footer-creative"] },
 ];
@@ -143,21 +158,22 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
     id: "dual-pillar",
     name: "Zwei-Säulen-Startseite",
     description:
-      "Dachseite für Marken mit zwei gleichwertigen Leistungen (z. B. Gründungs- + Karrierecoaching). Feste Reihenfolge: Hero → Trust → Zielgruppenansprache → Leistungen → Ablauf → About → Case Studies → Blog → FAQ → Contact/CTA.",
+      "Dachseite für Marken mit zwei gleichwertigen Leistungen (z. B. Gründungs- + Karrierecoaching). Feste Reihenfolge: Hero → Leistungen → Zielgruppe → About → Vorteile → Ablauf → Case Studies → CTA → Blog → FAQ → Kontakt.",
     styleId: "21-conversion-optimized",
     slots: {
       nav: STRUCTURE_NAV,
       hero: ["hero"],
+      "value-props": ["services", "content"],
       "trust-strip": ["content", "social-proof"],
       audience: ["content", "about"],
-      "value-props": ["services", "content"],
-      process: ["content", "engagement"],
       about: ["about", "content"],
+      benefits: ["benefits", "content"],
+      process: ["content", "engagement"],
       "social-proof": ["social-proof"],
+      "final-cta": ["cta"],
       blog: ["content", "editorial"],
       objection: ["content"],
       contact: ["contact"],
-      "final-cta": ["cta"],
       footer: STRUCTURE_FOOTER,
     },
   },
@@ -169,13 +185,13 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
     slots: {
       nav: STRUCTURE_NAV,
       hero: true,
-      "trust-strip": ["social-proof"],
-      problem: ["content"],
       "value-props": ["content", "services"],
+      problem: ["content"],
+      benefits: ["benefits", "content"],
+      process: ["content"],
       "social-proof": true,
-      objection: ["content"],
-      pricing: true,
       "final-cta": true,
+      objection: ["content"],
       contact: true,
       footer: STRUCTURE_FOOTER,
     },
@@ -188,14 +204,14 @@ export const MIXER_TEMPLATES: MixerTemplate[] = [
     slots: {
       nav: STRUCTURE_NAV,
       hero: true,
-      "trust-strip": ["social-proof"],
       "value-props": ["content", "services"],
       showcase: ["showcase"],
+      "trust-strip": ["social-proof"],
+      benefits: ["benefits", "content"],
       engagement: true,
       "social-proof": true,
-      objection: ["content"],
-      pricing: true,
       "final-cta": true,
+      objection: ["content"],
       footer: STRUCTURE_FOOTER,
     },
   },
@@ -561,11 +577,14 @@ const CATEGORY_TO_SLOT: Partial<Record<string, ConversionSlotId>> = {
   "typography-art": "hero",
   about: "about",
   services: "value-props",
+  benefits: "benefits",
   "social-proof": "social-proof",
   "social-creative": "social-proof",
   media: "showcase",
   cta: "final-cta",
-  pricing: "pricing",
+  // Pricing ist kein Mixer-Slot mehr — manuell hinzugefügte Pricing-Komponenten
+  // werden dem Vorteile/Nutzen-Bereich zugeordnet, damit die Reihenfolge stimmt.
+  pricing: "benefits",
   engagement: "process",
   urgency: "urgency",
   content: "value-props",
@@ -597,9 +616,10 @@ const ID_TO_SLOT: Array<{ pattern: RegExp; slotId: ConversionSlotId }> = [
   { pattern: /^blog/, slotId: "blog" },
   { pattern: /process-steps|quiz-funnel|progress-form/, slotId: "process" },
   { pattern: /^about|team-showcase|timeline|awards/, slotId: "about" },
+  { pattern: /^benefit|advantage/, slotId: "benefits" },
   { pattern: /^contact/, slotId: "contact" },
   { pattern: /pas-narrative/, slotId: "audience" },
-  { pattern: /pricing|comparison|roi-calculator/, slotId: "pricing" },
+  { pattern: /pricing|comparison|roi-calculator/, slotId: "benefits" },
   { pattern: /countdown|limited-availability|exit-intent|abandonment/, slotId: "urgency" },
 ];
 

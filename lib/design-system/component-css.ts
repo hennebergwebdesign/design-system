@@ -202,6 +202,12 @@ export const COMPONENT_BASE_CSS = `
 .ds-feature-icon { width: 44px; height: 44px; border-radius: var(--ds-radius-md); background-color: var(--ds-primary-100); display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 12px; }
 .ds-feature-title { font-size: 16px; font-weight: 600; color: var(--ds-text); font-family: var(--ds-font-heading); }
 
+/* ═══ Vorteile / Nutzen-Highlights ═══ */
+.ds-benefit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 40px; text-align: left; }
+.ds-benefit-card { display: flex; gap: 14px; align-items: flex-start; background-color: var(--ds-bg); border: var(--ds-border-w) solid var(--ds-border); border-radius: var(--ds-radius-lg); padding: 20px; box-shadow: var(--ds-shadow-sm); }
+.ds-benefit-check { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background-color: var(--ds-primary-100); color: var(--ds-primary); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; }
+.ds-benefit-title { font-size: 16px; font-weight: 600; color: var(--ds-text); font-family: var(--ds-font-heading); margin-bottom: 4px; }
+
 /* ═══ Process Steps ═══ */
 .ds-process-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-top: 40px; }
 .ds-process-step { text-align: center; }
